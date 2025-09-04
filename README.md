@@ -1,4 +1,5 @@
 # ♕ BYU CS 240 Chess
+This is Jonas' version control for the CS 240 Chess project
 
 This project demonstrates mastery of proper software design, client/server architecture, networking using HTTP and WebSocket, database persistence, unit testing, serialization, and security.
 
