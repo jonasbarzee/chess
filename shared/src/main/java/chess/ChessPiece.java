@@ -1,7 +1,11 @@
 package chess;
 
+import chess.piecemoves.KingMovesCalculator;
+import chess.piecemoves.PieceMovesCalculator;
+
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -18,6 +22,7 @@ public class ChessPiece {
         this.pieceColor = pieceColor;
         this.type = type;
     }
+
 
     /**
      * The various different chess piece options
@@ -55,10 +60,26 @@ public class ChessPiece {
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        if (piece.getPieceType() == PieceType.BISHOP) {
-         return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
+        if (piece.getPieceType() == PieceType.KING) {
+             chess.piecemoves.KingMovesCalculator KingCalc = new KingMovesCalculator();
+
+         return KingCalc.pieceMoves(myPosition, board);
 
         }
         return List.of();
     }
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
 }

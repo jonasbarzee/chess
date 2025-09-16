@@ -9,6 +9,6 @@ import java.util.Collection;
 
 public interface PieceMovesCalculator {
 
-    public Collection<ChessMove> PieceMove (ChessPosition position, ChessBoard board);
+    public Collection<ChessMove> pieceMoves (ChessPosition position, ChessBoard board);
 
 }
