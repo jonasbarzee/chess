@@ -1,7 +1,7 @@
 package chess;
 
 import chess.piecemoves.KingMovesCalculator;
-import chess.piecemoves.PieceMovesCalculator;
+import chess.piecemoves.RookMovesCalculator;
 
 import java.util.Collection;
 import java.util.List;
@@ -61,10 +61,12 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         if (piece.getPieceType() == PieceType.KING) {
-             chess.piecemoves.KingMovesCalculator KingCalc = new KingMovesCalculator();
-
-         return KingCalc.pieceMoves(myPosition, board);
-
+             chess.piecemoves.KingMovesCalculator kingCalc = new KingMovesCalculator();
+         return kingCalc.pieceMoves(myPosition, board);
+        }
+        else if (piece.getPieceType() == PieceType.ROOK) {
+            chess.piecemoves.RookMovesCalculator rookCalc = new RookMovesCalculator();
+        return rookCalc.pieceMoves(myPosition, board);
         }
         return List.of();
     }
