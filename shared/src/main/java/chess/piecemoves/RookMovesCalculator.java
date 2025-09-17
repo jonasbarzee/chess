@@ -2,14 +2,13 @@ package chess.piecemoves;
 
 import chess.ChessBoard;
 import chess.ChessMove;
-import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class RookMovesCalculator implements PieceMovesCalculator{
+public class RookMovesCalculator implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();
@@ -24,7 +23,7 @@ public class RookMovesCalculator implements PieceMovesCalculator{
                 break;
             } else if (inBounds(forward) && !isBlocked(forward, board)) {
                 addMove(forward, validMoves);
-            } else if (inBounds(forward) && isBlocked(forward, board) && !isEnemy(forward,board)) {
+            } else if (inBounds(forward) && isBlocked(forward, board) && !isEnemy(forward, board)) {
                 break;
             }
         }
@@ -47,7 +46,7 @@ public class RookMovesCalculator implements PieceMovesCalculator{
                 break;
             } else if (inBounds(down) && !isBlocked(down, board)) {
                 addMove(down, validMoves);
-            } else if (inBounds(down) && isBlocked(down,board) && !isEnemy(down, board)) {
+            } else if (inBounds(down) && isBlocked(down, board) && !isEnemy(down, board)) {
                 break;
             }
         }
@@ -66,38 +65,7 @@ public class RookMovesCalculator implements PieceMovesCalculator{
         return validMoves;
     }
 
-    public void addMove(ChessMove move, List<ChessMove> validMoves) { validMoves.add(move); }
-
-    public boolean isEnemy(ChessMove move, ChessBoard board) {
-        boolean isEnemy = false;
-        ChessPiece boardPiece = board.getPiece(move.getEndPosition());
-        ChessPiece currentPiece = board.getPiece(move.getStartPosition());
-        if (boardPiece.getTeamColor() != currentPiece.getTeamColor()) {
-           isEnemy = true;
-        }
-        return isEnemy;
-
-
-    }
-
-    public boolean isBlocked(ChessMove move, ChessBoard board) {
-        boolean isBlocked = false;
-        ChessPiece boardPiece = board.getPiece(move.getEndPosition());
-        if (boardPiece != null) {
-            isBlocked = true;
-        }
-        return isBlocked;
-
-    }
-
-    public boolean inBounds(ChessMove move) {
-
-        int col = move.getEndPosition().getColumn();
-        int row = move.getEndPosition().getRow();
-
-        if ((row > 8 || col > 8) || (row < 1 || col < 1)) {
-            return false;
-        }
-        return true;
+    public void addMove(ChessMove move, List<ChessMove> validMoves) {
+        validMoves.add(move);
     }
 }

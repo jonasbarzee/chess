@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class KingMovesCalculator implements PieceMovesCalculator{
+public class KingMovesCalculator implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();
@@ -42,27 +42,16 @@ public class KingMovesCalculator implements PieceMovesCalculator{
 
         boolean inBounds = inBounds(move);
         if (inBounds) {
-             ChessPiece boardPiece = board.getPiece(move.getEndPosition());
-             ChessPiece currentPiece = board.getPiece(move.getStartPosition());
-             if (boardPiece != null) {
-                 if (boardPiece.getTeamColor() != currentPiece.getTeamColor()) {
-                     validMoves.add(move);
-                 }
-             } else {
-                 validMoves.add(move);
-             }
+            ChessPiece boardPiece = board.getPiece(move.getEndPosition());
+            ChessPiece currentPiece = board.getPiece(move.getStartPosition());
+            if (boardPiece != null) {
+                if (boardPiece.getTeamColor() != currentPiece.getTeamColor()) {
+                    validMoves.add(move);
+                }
+            } else {
+                validMoves.add(move);
+            }
 
-             }
         }
-
-    public boolean inBounds(ChessMove move) {
-
-        int col = move.getEndPosition().getColumn();
-        int row = move.getEndPosition().getRow();
-
-         if ((row > 8 || col > 8) || (row < 1 || col < 1)) {
-            return false;
-        }
-        return true;
     }
 }

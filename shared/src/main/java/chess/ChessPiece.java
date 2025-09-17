@@ -1,6 +1,8 @@
 package chess;
 
+import chess.piecemoves.BishopMovesCalculator;
 import chess.piecemoves.KingMovesCalculator;
+import chess.piecemoves.QueenMovesCalculator;
 import chess.piecemoves.RookMovesCalculator;
 
 import java.util.Collection;
@@ -61,15 +63,21 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         if (piece.getPieceType() == PieceType.KING) {
-             chess.piecemoves.KingMovesCalculator kingCalc = new KingMovesCalculator();
-         return kingCalc.pieceMoves(myPosition, board);
-        }
-        else if (piece.getPieceType() == PieceType.ROOK) {
+            chess.piecemoves.KingMovesCalculator kingCalc = new KingMovesCalculator();
+            return kingCalc.pieceMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.ROOK) {
             chess.piecemoves.RookMovesCalculator rookCalc = new RookMovesCalculator();
-        return rookCalc.pieceMoves(myPosition, board);
+            return rookCalc.pieceMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.BISHOP) {
+            chess.piecemoves.BishopMovesCalculator bishopCalc = new BishopMovesCalculator();
+            return bishopCalc.pieceMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.QUEEN) {
+            chess.piecemoves.QueenMovesCalculator queenCalc = new QueenMovesCalculator();
+            return queenCalc.pieceMoves(myPosition, board);
         }
         return List.of();
     }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
