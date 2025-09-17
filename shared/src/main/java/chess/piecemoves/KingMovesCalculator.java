@@ -60,7 +60,7 @@ public class KingMovesCalculator implements PieceMovesCalculator{
         int col = move.getEndPosition().getColumn();
         int row = move.getEndPosition().getRow();
 
-         if (row > 7 || col > 7) {
+         if ((row > 8 || col > 8) || (row < 1 || col < 1)) {
             return false;
         }
         return true;
