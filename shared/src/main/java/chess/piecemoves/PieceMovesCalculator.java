@@ -22,11 +22,17 @@ public interface PieceMovesCalculator {
 
     default boolean isEnemy(ChessMove move, ChessBoard board) {
         boolean isEnemy = false;
-        ChessPiece boardPiece = board.getPiece(move.getEndPosition());
-        ChessPiece currentPiece = board.getPiece(move.getStartPosition());
-        if (boardPiece.getTeamColor() != currentPiece.getTeamColor()) {
-            isEnemy = true;
+        if (inBounds(move)) {
+            ChessPiece boardPiece = board.getPiece(move.getEndPosition());
+            ChessPiece currentPiece = board.getPiece(move.getStartPosition());
+            if (boardPiece == null) {
+                return isEnemy;
+            }
+            if (boardPiece.getTeamColor() != currentPiece.getTeamColor()) {
+                isEnemy = true;
+            }
         }
+
         return isEnemy;
 
 
@@ -34,10 +40,13 @@ public interface PieceMovesCalculator {
 
     default boolean isBlocked(ChessMove move, ChessBoard board) {
         boolean isBlocked = false;
-        ChessPiece boardPiece = board.getPiece(move.getEndPosition());
-        if (boardPiece != null) {
-            isBlocked = true;
+        if (inBounds(move)) {
+            ChessPiece boardPiece = board.getPiece(move.getEndPosition());
+            if (boardPiece != null) {
+                isBlocked = true;
+            }
         }
+
         return isBlocked;
     }
 

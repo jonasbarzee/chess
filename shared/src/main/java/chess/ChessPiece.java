@@ -1,9 +1,6 @@
 package chess;
 
-import chess.piecemoves.BishopMovesCalculator;
-import chess.piecemoves.KingMovesCalculator;
-import chess.piecemoves.QueenMovesCalculator;
-import chess.piecemoves.RookMovesCalculator;
+import chess.piecemoves.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -74,6 +71,9 @@ public class ChessPiece {
         } else if (piece.getPieceType() == PieceType.QUEEN) {
             chess.piecemoves.QueenMovesCalculator queenCalc = new QueenMovesCalculator();
             return queenCalc.pieceMoves(myPosition, board);
+        } else if (piece.getPieceType() == PieceType.KNIGHT) {
+            chess.piecemoves.KnightMovesCalculator knightCalc = new KnightMovesCalculator();
+            return knightCalc.pieceMoves(myPosition, board);
         }
         return List.of();
     }
