@@ -1,7 +1,5 @@
 package chess.piecemoves;
 
-// need to know: chess piece type, the position
-
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPiece;
@@ -16,7 +14,6 @@ public interface PieceMovesCalculator {
     default boolean inBounds(ChessMove move) {
         int col = move.getEndPosition().getColumn();
         int row = move.getEndPosition().getRow();
-
         return (row <= 8 && col <= 8) && (row >= 1 && col >= 1);
     }
 
@@ -32,7 +29,6 @@ public interface PieceMovesCalculator {
                 isEnemy = true;
             }
         }
-
         return isEnemy;
 
 
@@ -46,7 +42,6 @@ public interface PieceMovesCalculator {
                 isBlocked = true;
             }
         }
-
         return isBlocked;
     }
 

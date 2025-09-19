@@ -34,7 +34,6 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
         validateMove(leftOneForwardTwo, board, validMoves);
 
         return validMoves;
-
     }
 
     public void validateMove(ChessMove move, ChessBoard board, List<ChessMove> validMoves) {
