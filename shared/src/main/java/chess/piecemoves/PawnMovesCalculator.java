@@ -20,35 +20,59 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         chess.ChessMove forwardTwo = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 2, col), null);
         chess.ChessMove forwardLeft = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col - 1), null);
         chess.ChessMove forwardRight = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col + 1), null);
+        // White promotion moves
+        chess.ChessMove forwardOnePromoKnight = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col), ChessPiece.PieceType.KNIGHT);
+        chess.ChessMove forwardOnePromoQueen = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col), ChessPiece.PieceType.QUEEN);
+        chess.ChessMove forwardOnePromoRook = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col), ChessPiece.PieceType.ROOK);
+        chess.ChessMove forwardOnePromoBishop = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col), ChessPiece.PieceType.BISHOP);
+//        chess.ChessMove forwardLeft = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col - 1), null);
+//        chess.ChessMove forwardRight = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + 1, col + 1), null);
 
         // Black moves
         chess.ChessMove backOne = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col), null);
         chess.ChessMove backTwo = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 2, col), null);
         chess.ChessMove backLeft = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col - 1), null);
         chess.ChessMove backRight = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col + 1), null);
+        // Black Promotion moves
+        chess.ChessMove backOnePromoKnight = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col), ChessPiece.PieceType.KNIGHT);
+        chess.ChessMove backOnePromoQueen = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col), ChessPiece.PieceType.QUEEN);
+        chess.ChessMove backOnePromoRook = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col), ChessPiece.PieceType.ROOK);
+        chess.ChessMove backOnePromoBishop = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - 1, col), ChessPiece.PieceType.BISHOP);
 
         // White validate moves
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            validateMoves(forwardOne, board, validMoves, false);
-            validateMoves(forwardLeft, board, validMoves, true);
-            validateMoves(forwardRight, board, validMoves, true);
             // if the pawn is at it's starting row
             if (row == 2 && !isBlocked(forwardOne, board)) {
                 validateMoves(forwardTwo, board, validMoves, false);
             }
             // if the pawn is in the row before moving into the promotion row
             if (row == 7) {
+                validateMoves(forwardOnePromoKnight, board, validMoves, false);
+                validateMoves(forwardOnePromoQueen, board, validMoves, false);
+                validateMoves(forwardOnePromoRook, board, validMoves, false);
+                validateMoves(forwardOnePromoBishop, board, validMoves, false);
 
+            } else {
+                validateMoves(forwardOne, board, validMoves, false);
+                validateMoves(forwardLeft, board, validMoves, true);
+                validateMoves(forwardRight, board, validMoves, true);
             }
         }
         // Black validate moves
         if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-            validateMoves(backOne, board, validMoves, false);
-            validateMoves(backLeft, board,  validMoves, true);
-            validateMoves(backRight, board,  validMoves, true);
             // if the pawn is at it's starting row
             if (row == 7 && !isBlocked(backOne, board)) {
                 validateMoves(backTwo, board, validMoves, false);
+            }
+            if (row == 2) {
+                validateMoves(backOnePromoKnight, board, validMoves, false);
+                validateMoves(backOnePromoQueen, board, validMoves, false);
+                validateMoves(backOnePromoRook, board, validMoves, false);
+                validateMoves(backOnePromoBishop, board, validMoves, false);
+            } else {
+                validateMoves(backOne, board, validMoves, false);
+                validateMoves(backLeft, board,  validMoves, true);
+                validateMoves(backRight, board,  validMoves, true);
             }
         }
 
