@@ -1,14 +1,16 @@
-package chess.piecemoves;
+package chess.piecemoves.steppingpieces;
 
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
+import chess.piecemoves.PieceMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class KnightMovesCalculator implements PieceMovesCalculator {
+public class KnightMovesCalculator extends SteppingPieceMovesCalculator {
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();
@@ -35,18 +37,4 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
 
         return validMoves;
     }
-
-    public void validateMove(ChessMove move, ChessBoard board, List<ChessMove> validMoves) {
-        boolean inBounds = inBounds(move);
-        boolean isEnemy = isEnemy(move, board);
-        boolean isBlocked = isBlocked(move, board);
-
-        if (inBounds && isEnemy && isBlocked) {
-            validMoves.add(move);
-        }
-        if (inBounds && !isBlocked) {
-            validMoves.add(move);
-        }
-    }
-
 }

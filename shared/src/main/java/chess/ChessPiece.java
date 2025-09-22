@@ -4,6 +4,8 @@ import chess.piecemoves.*;
 import chess.piecemoves.slidingpieces.BishopMovesCalculator;
 import chess.piecemoves.slidingpieces.QueenMovesCalculator;
 import chess.piecemoves.slidingpieces.RookMovesCalculator;
+import chess.piecemoves.steppingpieces.KingMovesCalculator;
+import chess.piecemoves.steppingpieces.KnightMovesCalculator;
 
 import java.util.Collection;
 import java.util.List;
@@ -63,7 +65,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         if (piece.getPieceType() == PieceType.KING) {
-            chess.piecemoves.KingMovesCalculator kingCalc = new KingMovesCalculator();
+            KingMovesCalculator kingCalc = new KingMovesCalculator();
             return kingCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.ROOK) {
             RookMovesCalculator rookCalc = new RookMovesCalculator();
@@ -75,7 +77,7 @@ public class ChessPiece {
             QueenMovesCalculator queenCalc = new QueenMovesCalculator();
             return queenCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.KNIGHT) {
-            chess.piecemoves.KnightMovesCalculator knightCalc = new KnightMovesCalculator();
+            KnightMovesCalculator knightCalc = new KnightMovesCalculator();
             return knightCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.PAWN) {
             chess.piecemoves.PawnMovesCalculator pawnCalc = new PawnMovesCalculator();

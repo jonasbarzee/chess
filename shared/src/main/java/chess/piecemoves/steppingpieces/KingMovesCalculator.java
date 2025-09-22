@@ -1,14 +1,16 @@
-package chess.piecemoves;
+package chess.piecemoves.steppingpieces;
 
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
+import chess.piecemoves.Direction;
+import chess.piecemoves.PieceMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class KingMovesCalculator implements PieceMovesCalculator {
+public class KingMovesCalculator extends SteppingPieceMovesCalculator {
 
     private static final List<Direction> KING_DIRECTIONS = List.of(Direction.NORTH, Direction.NORTHEAST, Direction.NORTHWEST, Direction.EAST, Direction.WEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.SOUTHWEST);
 
@@ -25,15 +27,5 @@ public class KingMovesCalculator implements PieceMovesCalculator {
             validateMove(move, board, validMoves);
         }
         return validMoves;
-    }
-
-    public void validateMove(ChessMove move, ChessBoard board, List<ChessMove> validMoves) {
-        boolean inBounds = inBounds(move);
-        boolean isBlocked = isBlocked(move, board);
-        boolean isEnemy = isEnemy(move, board);
-
-        if ((inBounds & !isBlocked) || (inBounds & isBlocked & isEnemy)) {
-            validMoves.add(move);
-        }
     }
 }
