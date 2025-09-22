@@ -9,64 +9,40 @@ import java.util.Collection;
 import java.util.List;
 
 public class RookMovesCalculator implements PieceMovesCalculator {
+
+    private static final List<Direction> ROOKMOVES = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();
         int col = position.getColumn();
         int i;
         List<ChessMove> validMoves = new ArrayList<>();
-//
-//        for (i = 1; i < 7; i++) {
-//            chess.ChessMove forward = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + i, col), null);
-//            if (inBounds(forward) && isBlocked(forward, board) && isEnemy(forward, board)) {
-//                addMove(forward, validMoves);
-//                break;
-//            } else if (inBounds(forward) && !isBlocked(forward, board)) {
-//                addMove(forward, validMoves);
-//            } else if (inBounds(forward) && isBlocked(forward, board) && !isEnemy(forward, board)) {
-//                break;
-//            }
-//        }
-//
-//        for (i = 1; i < 7; i++) {
-//            chess.ChessMove right = new ChessMove(new ChessPosition(row, col), new ChessPosition(row, col + i), null);
-//            if (inBounds(right) && isBlocked(right, board) && isEnemy(right, board)) {
-//                addMove(right, validMoves);
-//                break;
-//            } else if (inBounds(right) && !isBlocked(right, board)) {
-//                addMove(right, validMoves);
-//            } else if (inBounds(right) && isBlocked(right, board) && !isEnemy(right, board)) {
-//                break;
-//            }
-//        }
-//        for (i = 1; i < 7; i++) {
-//            chess.ChessMove down = new ChessMove(new ChessPosition(row, col), new ChessPosition(row - i, col), null);
-//            if (inBounds(down) && isBlocked(down, board) && isEnemy(down, board)) {
-//                addMove(down, validMoves);
-//                break;
-//            } else if (inBounds(down) && !isBlocked(down, board)) {
-//                addMove(down, validMoves);
-//            } else if (inBounds(down) && isBlocked(down, board) && !isEnemy(down, board)) {
-//                break;
-//            }
-//        }
-//        for (i = 1; i < 7; i++) {
-//            chess.ChessMove left = new ChessMove(new ChessPosition(row, col), new ChessPosition(row, col - i), null);
-//            if (inBounds(left) && isBlocked(left, board) && isEnemy(left, board)) {
-//                addMove(left, validMoves);
-//                break;
-//            } else if (inBounds(left) && !isBlocked(left, board)) {
-//                addMove(left, validMoves);
-//            } else if (inBounds(left) && isBlocked(left, board) && !isEnemy(left, board)) {
-//                break;
-//            }
-//        }
-
+        addMoves(row, col, board, validMoves);
 
         return validMoves;
     }
 
-    public void addMove(ChessMove move, List<ChessMove> validMoves) {
-        validMoves.add(move);
+    void addMoves(int row, int col, ChessBoard board, List<ChessMove> validMoves) {
+        for (Direction dir : ROOKMOVES) {
+            for (int i = 1; i < 8; i++) {
+                int newRow = row + (i * dir.getRowChange());
+                int newCol = col + (i * dir.getColChange());
+                chess.ChessMove move = new ChessMove(new ChessPosition(row, col), new ChessPosition(newRow, newCol), null);
+
+                boolean inBounds = inBounds(move);
+                boolean isBlocked = isBlocked(move, board);
+                boolean isEnemy = isEnemy(move, board);
+
+                if ((inBounds & !isBlocked) || (inBounds & isBlocked & isEnemy)) {
+                    validMoves.add(move);
+                    if (isEnemy) {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
     }
 }

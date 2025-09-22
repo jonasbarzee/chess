@@ -18,7 +18,12 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
         int col = position.getColumn();
         List<ChessMove> validMoves = new ArrayList<>();
 
+        addMoves(row, col, board, validMoves);
 
+        return validMoves;
+    }
+
+    void addMoves(int row, int col, ChessBoard board, List<ChessMove> validMoves) {
         for (Direction dir : QUEENMOVES) {
             for (int i = 1; i < 8; i++) {
                 int newRow = row + (i * dir.getRowChange());
@@ -35,7 +40,6 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
                 } else { break; }
             }
         }
-        return validMoves;
     }
 }
 
