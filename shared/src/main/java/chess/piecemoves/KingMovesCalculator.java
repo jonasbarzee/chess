@@ -23,7 +23,6 @@ public class KingMovesCalculator implements PieceMovesCalculator {
             int newCol = col + direction.getColChange();
             chess.ChessMove move = new ChessMove(new ChessPosition(row, col), new ChessPosition(newRow, newCol), null);
             validateMove(move, board, validMoves);
-
         }
         return validMoves;
     }
