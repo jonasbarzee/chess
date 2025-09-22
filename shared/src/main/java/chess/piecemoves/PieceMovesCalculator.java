@@ -45,4 +45,6 @@ public interface PieceMovesCalculator {
         return isBlocked;
     }
 
+    // ADD MOVES ONLY FOR QUEEN
+
 }

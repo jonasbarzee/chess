@@ -1,30 +1,26 @@
-package chess.piecemoves;
+package chess.piecemoves.slidingpieces;
 
 import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
+import chess.piecemoves.Direction;
+import chess.piecemoves.PieceMovesCalculator;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class RookMovesCalculator implements PieceMovesCalculator {
-
-    private static final List<Direction> ROOKMOVES = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
-
-    @Override
-    public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
-        int row = position.getRow();
-        int col = position.getColumn();
-        int i;
-        List<ChessMove> validMoves = new ArrayList<>();
-        addMoves(row, col, board, validMoves);
-
-        return validMoves;
-    }
+public abstract class SlidingPieceMovesCalculator implements PieceMovesCalculator {
 
     void addMoves(int row, int col, ChessBoard board, List<ChessMove> validMoves) {
-        for (Direction dir : ROOKMOVES) {
+        chess.ChessPiece currentPiece = board.getPiece(new ChessPosition(row, col));
+
+        List<Direction> Directions = switch (currentPiece.getPieceType()) {
+            case QUEEN -> Directions = List.of(Direction.NORTH, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST, Direction.SOUTH, Direction.EAST, Direction.WEST);
+            case BISHOP -> Directions = List.of(Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST);
+            case ROOK -> Directions = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
+            default -> List.of();
+        };
+
+        for (Direction dir : Directions) {
             for (int i = 1; i < 8; i++) {
                 int newRow = row + (i * dir.getRowChange());
                 int newCol = col + (i * dir.getColChange());

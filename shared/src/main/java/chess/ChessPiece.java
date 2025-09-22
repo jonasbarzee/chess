@@ -1,6 +1,9 @@
 package chess;
 
 import chess.piecemoves.*;
+import chess.piecemoves.slidingpieces.BishopMovesCalculator;
+import chess.piecemoves.slidingpieces.QueenMovesCalculator;
+import chess.piecemoves.slidingpieces.RookMovesCalculator;
 
 import java.util.Collection;
 import java.util.List;
@@ -63,13 +66,13 @@ public class ChessPiece {
             chess.piecemoves.KingMovesCalculator kingCalc = new KingMovesCalculator();
             return kingCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.ROOK) {
-            chess.piecemoves.RookMovesCalculator rookCalc = new RookMovesCalculator();
+            RookMovesCalculator rookCalc = new RookMovesCalculator();
             return rookCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.BISHOP) {
-            chess.piecemoves.BishopMovesCalculator bishopCalc = new BishopMovesCalculator();
+            BishopMovesCalculator bishopCalc = new BishopMovesCalculator();
             return bishopCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.QUEEN) {
-            chess.piecemoves.QueenMovesCalculator queenCalc = new QueenMovesCalculator();
+            QueenMovesCalculator queenCalc = new QueenMovesCalculator();
             return queenCalc.pieceMoves(myPosition, board);
         } else if (piece.getPieceType() == PieceType.KNIGHT) {
             chess.piecemoves.KnightMovesCalculator knightCalc = new KnightMovesCalculator();
