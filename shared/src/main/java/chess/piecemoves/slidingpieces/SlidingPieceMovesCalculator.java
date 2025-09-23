@@ -32,7 +32,7 @@ public abstract class SlidingPieceMovesCalculator implements PieceMovesCalculato
 
                 if ((inBounds & !isBlocked) || (inBounds & isBlocked & isEnemy)) {
                     validMoves.add(move);
-                    if (isEnemy) {
+                    if (isEnemy) { // so the loop will stop when you capture the first enemy
                         break;
                     }
                 } else {

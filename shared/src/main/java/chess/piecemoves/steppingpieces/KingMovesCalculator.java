@@ -4,7 +4,6 @@ import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
 import chess.piecemoves.Direction;
-import chess.piecemoves.PieceMovesCalculator;
 
 import java.util.ArrayList;
 import java.util.Collection;
