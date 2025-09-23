@@ -12,8 +12,6 @@ import java.util.List;
 
 public class QueenMovesCalculator extends SlidingPieceMovesCalculator {
 
-    private static final List<Direction> QUEENMOVES = List.of(Direction.NORTH, Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST, Direction.SOUTH, Direction.EAST, Direction.WEST);
-
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();

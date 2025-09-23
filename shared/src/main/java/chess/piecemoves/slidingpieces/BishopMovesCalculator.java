@@ -12,8 +12,6 @@ import java.util.List;
 
 public class BishopMovesCalculator extends SlidingPieceMovesCalculator {
 
-    private static final List<Direction>BISHOPMOVES = List.of(Direction.NORTHEAST, Direction.NORTHWEST, Direction.SOUTHEAST, Direction.SOUTHWEST);
-
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();

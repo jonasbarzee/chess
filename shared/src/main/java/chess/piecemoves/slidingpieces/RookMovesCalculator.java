@@ -12,8 +12,6 @@ import java.util.List;
 
 public class RookMovesCalculator extends SlidingPieceMovesCalculator {
 
-    private static final List<Direction> ROOKMOVES = List.of(Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
-
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();

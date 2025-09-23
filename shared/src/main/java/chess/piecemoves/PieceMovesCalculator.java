@@ -30,8 +30,6 @@ public interface PieceMovesCalculator {
             }
         }
         return isEnemy;
-
-
     }
 
     default boolean isBlocked(ChessMove move, ChessBoard board) {
@@ -44,7 +42,4 @@ public interface PieceMovesCalculator {
         }
         return isBlocked;
     }
-
-    // ADD MOVES ONLY FOR QUEEN
-
 }
