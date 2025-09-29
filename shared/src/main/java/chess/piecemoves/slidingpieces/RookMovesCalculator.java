@@ -14,7 +14,6 @@ public class RookMovesCalculator extends SlidingPieceMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
         int row = position.getRow();
         int col = position.getColumn();
-        int i;
         List<ChessMove> validMoves = new ArrayList<>();
         addMoves(row, col, board, validMoves);
 

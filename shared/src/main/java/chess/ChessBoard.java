@@ -76,7 +76,6 @@ public class ChessBoard {
         squares[6][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -88,13 +87,13 @@ public class ChessBoard {
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(squares);
+        return Objects.hashCode(squares);
     }
 
     @Override
     public String toString() {
         return "ChessBoard{" +
-                "squares=" + Arrays.toString(squares) +
+                "squares=" + Arrays.deepToString(squares) +
                 '}';
     }
 }
