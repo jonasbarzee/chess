@@ -71,7 +71,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-//        ChessPiece curPiece = board.getPiece(move.getStartPosition());
+        if (isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())) {
+            throw new InvalidMoveException ("Move puts allied king in check.");
+
+        } else {
+            ChessPiece curPiece = board.getPiece(move.getStartPosition());
+            board.addPiece(move.getEndPosition(), curPiece);
+            board.removePiece(move.getStartPosition());
+        }
 
     }
 
