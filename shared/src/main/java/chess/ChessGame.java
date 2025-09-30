@@ -1,6 +1,7 @@
 package chess;
 
-import java.util.Collection;
+
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,7 +11,14 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    private TeamColor turn;
+    private ChessBoard board;
+
     public ChessGame() {
+
+        turn = TeamColor.WHITE;
+        board = new ChessBoard();
+        board.resetBoard();
 
     }
 
@@ -18,7 +26,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return turn;
     }
 
     /**
@@ -27,7 +35,14 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        switch (team) {
+            case WHITE -> {
+                turn = TeamColor.WHITE;
+            }
+            case BLACK -> {
+                turn = TeamColor.BLACK;
+            }
+        }
     }
 
     /**
@@ -56,7 +71,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+//        ChessPiece curPiece = board.getPiece(move.getStartPosition());
+
     }
 
     /**
@@ -66,7 +82,39 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPos = null;
+        Collection<ChessMove> allPieceMoves = new ArrayList<>();
+
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece curPiece = board.getPiece(curPos);
+                if (curPiece != null && curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor) {
+                    kingPos = curPos;
+                    break;
+                }
+            }
+            if (kingPos != null) {
+                break;
+            }
+        }
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece curPiece = board.getPiece(curPos);
+                if (curPiece != null && curPiece.getTeamColor() != board.getPiece(kingPos).getTeamColor()) {
+                    Collection<ChessMove> curPieceMoves = curPiece.pieceMoves(board, curPos);
+                    allPieceMoves.addAll(curPieceMoves);
+                }
+            }
+        }
+        for (ChessMove move : allPieceMoves) {
+            ChessPosition moveEndPos = move.getEndPosition();
+            if (moveEndPos.equals(kingPos)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -96,7 +144,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -105,6 +153,28 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "turn=" + turn +
+                ", board=" + board +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return turn == chessGame.turn && Objects.deepEquals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(turn, board);
     }
 }
