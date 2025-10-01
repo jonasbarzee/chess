@@ -63,7 +63,8 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         if (board.getPiece(startPosition) == null) {
             return null;
-        }
+        } else if (getTeamTurn() != board.getPiece(startPosition).getTeamColor())
+            return null;:wq
         return new ArrayList<>();
     }
 
@@ -77,17 +78,25 @@ public class ChessGame {
 
         if (validMoves(move.getStartPosition()) == null) {
             throw new InvalidMoveException ("No piece at ChessMove startPos.");
-        }
-
-        if (isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())) {
+        } else if (validMoves(move.getStartPosition()) == null) {
+            throw new InvalidMoveException ("Trying to move a piece when it is not its teams turn.");
+        } else if (isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())) {
             throw new InvalidMoveException ("Move puts allied king in check.");
-
-        } else {
+        } else if (board.getPiece(move.getStartPosition()) != null && board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getStartPosition()).getTeamColor() == board.getPiece(move.getEndPosition()).getTeamColor()) {
+            throw new InvalidMoveException("Move takes own color.");
+        }
+        else {
             ChessPiece curPiece = board.getPiece(move.getStartPosition());
             board.addPiece(move.getEndPosition(), curPiece);
             board.removePiece(move.getStartPosition());
         }
+//        TeamColor turn = (getTeamTurn() == TeamColor.WHITE) ? setTeamTurn(TeamColor.BLACK): setTeamTurn(TeamColor.WHITE);
 
+        if (getTeamTurn() == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     /**
