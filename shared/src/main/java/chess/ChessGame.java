@@ -3,6 +3,7 @@ package chess;
 
 import java.util.*;
 
+
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -13,12 +14,14 @@ public class ChessGame {
 
     private TeamColor turn;
     private ChessBoard board;
+    private ChessBoard clonedBoard;
 
     public ChessGame() {
 
         turn = TeamColor.WHITE;
         board = new ChessBoard();
         board.resetBoard();
+        clonedBoard = board;
 
     }
 
@@ -53,6 +56,19 @@ public class ChessGame {
         BLACK
     }
 
+    private void copyBoard() {
+        clonedBoard = board.copyBoard(board);
+    }
+
+    private void makeMoveOnCloneBoard(ChessMove move) {
+        // calls cloneBoard to get a new cloned chess board then makes the move on the cloned board
+        copyBoard();
+        ChessPiece pieceToMove = clonedBoard.getPiece(move.getStartPosition());
+        clonedBoard.addPiece(move.getEndPosition(), pieceToMove);
+        clonedBoard.removePiece(move.getStartPosition());
+
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -61,11 +77,19 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        if (board.getPiece(startPosition) == null) {
-            return null;
-        } else if (getTeamTurn() != board.getPiece(startPosition).getTeamColor())
-            return null;:wq
-        return new ArrayList<>();
+        // Making curPieceMoves and curPieceMovesCopy to avoid modifying a collection while iterating through the collection.
+        ChessPiece curPiece = board.getPiece(startPosition);
+        Collection<ChessMove> curPieceMoves = curPiece.pieceMoves(board, startPosition);
+        Collection<ChessMove> curPieceMovesCopy = curPiece.pieceMoves(board, startPosition);
+
+        // make the move on the cloned board, see if the king is in check, if yes then remove the move from the validMoves, if not in check leave the move in the validMoves collection.
+        for (ChessMove curMove : curPieceMovesCopy) {
+            makeMoveOnCloneBoard(curMove);
+            if (isInCheck(clonedBoard.getPiece(curMove.getEndPosition()).getTeamColor())) {
+                curPieceMoves.remove(curMove);
+            }
+        }
+        return curPieceMoves;
     }
 
     /**
@@ -76,26 +100,29 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
 
-        if (validMoves(move.getStartPosition()) == null) {
-            throw new InvalidMoveException ("No piece at ChessMove startPos.");
-        } else if (validMoves(move.getStartPosition()) == null) {
-            throw new InvalidMoveException ("Trying to move a piece when it is not its teams turn.");
+        // Checking to see if there is a ChessPiece at the starting position as to not use a method on a null pointer.
+        if (board.getPiece(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("No piece at ChessMove startPos.");
+
+            // Validating that the current teams turn is the same as the piece that is trying to move as to not move a piece out of its turn.
+        } else if (getTeamTurn() != board.getPiece(move.getStartPosition()).getTeamColor()) {
+            throw new InvalidMoveException("Trying to move a piece when it is not its teams turn.");
         } else if (isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())) {
-            throw new InvalidMoveException ("Move puts allied king in check.");
+            throw new InvalidMoveException("Move puts allied king in check.");
+
+            // Checking that the start piece's color and end position's piece color (if there is one) are different as to not allow allied pieces to take each other.
         } else if (board.getPiece(move.getStartPosition()) != null && board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getStartPosition()).getTeamColor() == board.getPiece(move.getEndPosition()).getTeamColor()) {
             throw new InvalidMoveException("Move takes own color.");
-        }
-        else {
-            ChessPiece curPiece = board.getPiece(move.getStartPosition());
-            board.addPiece(move.getEndPosition(), curPiece);
-            board.removePiece(move.getStartPosition());
-        }
-//        TeamColor turn = (getTeamTurn() == TeamColor.WHITE) ? setTeamTurn(TeamColor.BLACK): setTeamTurn(TeamColor.WHITE);
-
-        if (getTeamTurn() == TeamColor.WHITE) {
-            setTeamTurn(TeamColor.BLACK);
         } else {
-            setTeamTurn(TeamColor.WHITE);
+            if (validMoves(move.getStartPosition()).contains(move)) {
+                ChessPiece curPiece = board.getPiece(move.getStartPosition());
+                board.addPiece(move.getEndPosition(), curPiece);
+                board.removePiece(move.getStartPosition());
+            }
+        }
+        switch (turn) {
+            case WHITE -> setTeamTurn(TeamColor.BLACK);
+            case BLACK -> setTeamTurn(TeamColor.WHITE);
         }
     }
 
@@ -106,13 +133,14 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        // Takes the team color, finds that teams king, finds all enemies and their movesets, verifies that the current team's king is not in check.
         ChessPosition kingPos = null;
         Collection<ChessMove> allPieceMoves = new ArrayList<>();
 
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition curPos = new ChessPosition(row, col);
-                ChessPiece curPiece = board.getPiece(curPos);
+                ChessPiece curPiece = clonedBoard.getPiece(curPos);
                 if (curPiece != null && curPiece.getPieceType() == ChessPiece.PieceType.KING && curPiece.getTeamColor() == teamColor) {
                     kingPos = curPos;
                     break;
@@ -122,16 +150,18 @@ public class ChessGame {
                 break;
             }
         }
+
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition curPos = new ChessPosition(row, col);
-                ChessPiece curPiece = board.getPiece(curPos);
-                if (curPiece != null && curPiece.getTeamColor() != board.getPiece(kingPos).getTeamColor()) {
-                    Collection<ChessMove> curPieceMoves = curPiece.pieceMoves(board, curPos);
+                ChessPiece curPiece = clonedBoard.getPiece(curPos);
+                if (curPiece != null && curPiece.getTeamColor() != clonedBoard.getPiece(kingPos).getTeamColor()) {
+                    Collection<ChessMove> curPieceMoves = curPiece.pieceMoves(clonedBoard, curPos);
                     allPieceMoves.addAll(curPieceMoves);
                 }
             }
         }
+
         for (ChessMove move : allPieceMoves) {
             ChessPosition moveEndPos = move.getEndPosition();
             if (moveEndPos.equals(kingPos)) {
@@ -169,6 +199,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+        clonedBoard = this.board;
     }
 
     /**

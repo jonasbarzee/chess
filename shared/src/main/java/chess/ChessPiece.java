@@ -86,6 +86,13 @@ public class ChessPiece {
         return List.of();
     }
 
+    public static ChessPiece copyPiece(ChessPiece piece) {
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
+        PieceType pieceType = piece.getPieceType();
+        return new ChessPiece(pieceColor, pieceType);
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

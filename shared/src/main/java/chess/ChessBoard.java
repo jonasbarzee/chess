@@ -3,6 +3,8 @@ package chess;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static chess.ChessPiece.copyPiece;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -78,6 +80,24 @@ public class ChessBoard {
         squares[6][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         squares[6][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         squares[6][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+    }
+
+
+    public ChessBoard copyBoard(ChessBoard realBoard) {
+        ChessBoard boardCopy = new ChessBoard();
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece curPiece = realBoard.getPiece(curPos);
+                if (curPiece != null) {
+                    // copy chess piece and add to boardCopy
+                    ChessPiece curPieceCopy = copyPiece(curPiece);
+                    boardCopy.addPiece(curPos,curPieceCopy);
+                }
+            }
+        }
+        return boardCopy;
+
     }
 
 
