@@ -61,7 +61,10 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        if (board.getPiece(startPosition) == null) {
+            return null;
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -71,6 +74,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+
+        if (validMoves(move.getStartPosition()) == null) {
+            throw new InvalidMoveException ("No piece at ChessMove startPos.");
+        }
+
         if (isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())) {
             throw new InvalidMoveException ("Move puts allied king in check.");
 
