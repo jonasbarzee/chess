@@ -99,26 +99,21 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-
         // Checking to see if there is a ChessPiece at the starting position as to not use a method on a null pointer.
         if (board.getPiece(move.getStartPosition()) == null) {
             throw new InvalidMoveException("No piece at ChessMove startPos.");
 
             // Validating that the current teams turn is the same as the piece that is trying to move as to not move a piece out of its turn.
-        } else if (getTeamTurn() != board.getPiece(move.getStartPosition()).getTeamColor()) {
+        }
+        if (getTeamTurn() != board.getPiece(move.getStartPosition()).getTeamColor()) {
             throw new InvalidMoveException("Trying to move a piece when it is not its teams turn.");
-        } else if (isInCheck(board.getPiece(move.getStartPosition()).getTeamColor())) {
-            throw new InvalidMoveException("Move puts allied king in check.");
-
-            // Checking that the start piece's color and end position's piece color (if there is one) are different as to not allow allied pieces to take each other.
-        } else if (board.getPiece(move.getStartPosition()) != null && board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getStartPosition()).getTeamColor() == board.getPiece(move.getEndPosition()).getTeamColor()) {
-            throw new InvalidMoveException("Move takes own color.");
+        }
+        if (validMoves(move.getStartPosition()).contains(move)) {
+            ChessPiece curPiece = board.getPiece(move.getStartPosition());
+            board.addPiece(move.getEndPosition(), curPiece);
+            board.removePiece(move.getStartPosition());
         } else {
-            if (validMoves(move.getStartPosition()).contains(move)) {
-                ChessPiece curPiece = board.getPiece(move.getStartPosition());
-                board.addPiece(move.getEndPosition(), curPiece);
-                board.removePiece(move.getStartPosition());
-            }
+            throw new InvalidMoveException("error");
         }
         switch (turn) {
             case WHITE -> setTeamTurn(TeamColor.BLACK);
