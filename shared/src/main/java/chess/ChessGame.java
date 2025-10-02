@@ -85,6 +85,7 @@ public class ChessGame {
         // make the move on the cloned board, see if the king is in check, if yes then remove the move from the validMoves, if not in check leave the move in the validMoves collection.
         for (ChessMove curMove : curPieceMovesCopy) {
             makeMoveOnCloneBoard(curMove);
+            System.out.println("Calling isInCheck from validMoves");
             if (isInCheck(clonedBoard.getPiece(curMove.getEndPosition()).getTeamColor())) {
                 curPieceMoves.remove(curMove);
             }
@@ -130,16 +131,8 @@ public class ChessGame {
         }
     }
 
-    /**
-     * Determines if the given team is in check
-     *
-     * @param teamColor which team to check for check
-     * @return True if the specified team is in check
-     */
-    public boolean isInCheck(TeamColor teamColor) {
-        // Takes the team color, finds that teams king, finds all enemies and their movesets, verifies that the current team's king is not in check.
+    private ChessPosition getKingPos(TeamColor teamColor) {
         ChessPosition kingPos = null;
-        Collection<ChessMove> allPieceMoves = new ArrayList<>();
 
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
@@ -154,6 +147,11 @@ public class ChessGame {
                 break;
             }
         }
+        return kingPos;
+    }
+
+    private Collection<ChessMove> getEnemyMoves(ChessPosition kingPos) {
+        Collection<ChessMove> allPieceMoves = new ArrayList<>();
 
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
@@ -165,13 +163,46 @@ public class ChessGame {
                 }
             }
         }
+        return allPieceMoves;
+    }
+
+    private Collection<ChessMove> getAllyMoves(TeamColor teamColor) {
+        Collection<ChessMove> allPieceMoves = new ArrayList<>();
+
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece curPiece = clonedBoard.getPiece(curPos);
+                if (curPiece != null && curPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> curPieceMoves = curPiece.pieceMoves(clonedBoard, curPos);
+                    allPieceMoves.addAll(curPieceMoves);
+                }
+            }
+        }
+        return allPieceMoves;
+    }
+
+    /**
+     * Determines if the given team is in check
+     *
+     * @param teamColor which team to check for check
+     * @return True if the specified team is in check
+     */
+    public boolean isInCheck(TeamColor teamColor) {
+        // Takes the team color, finds that teams king, finds all enemies and their movesets, verifies that the current team's king is not in check.
+        ChessPosition kingPos = getKingPos(teamColor);
+        Collection<ChessMove> allPieceMoves = getEnemyMoves(kingPos);
+        System.out.println(board.toString());
+        System.out.println(clonedBoard.toString());
 
         for (ChessMove move : allPieceMoves) {
             ChessPosition moveEndPos = move.getEndPosition();
             if (moveEndPos.equals(kingPos)) {
+                System.out.println("Returning true from isInCheck");
                 return true;
             }
         }
+        System.out.println("Returning false from isInCheck");
         return false;
     }
 
@@ -182,11 +213,46 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        System.out.println("Calling isInCheck from isInCheckmate (first call)");
         if (isInCheck(teamColor)) {
+            // check all kings moves
+            ChessPosition kingPos = getKingPos(teamColor);
+            Collection<ChessMove> enemyPieceMoves = getEnemyMoves(kingPos);
+            Collection<ChessMove> allyPieceMoves = getAllyMoves(teamColor);
+
+            ChessPiece king = board.getPiece(kingPos);
+
+            for (ChessMove allyMove : allyPieceMoves) {
+                for (ChessMove enemyMove : enemyPieceMoves) {
+                    if (allyMove.getEndPosition().equals(enemyMove.getStartPosition())) {
+                        // do the king move on the simulated board and see if the king is now out of check
+                        makeMoveOnCloneBoard(allyMove);
+                        System.out.println("Calling isInCheck from isInCheckmate (second call)");
+                        if (!isInCheck(teamColor)) {
+                            return false;
+                        }
+                    }
+                }
+            }
             return true;
         }
         return false;
 
+    }
+
+    private Collection<ChessPosition> getAllyPositions(TeamColor teamColor) {
+       Collection<ChessPosition> allyPositions = new ArrayList<>();
+
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece curPiece = clonedBoard.getPiece(curPos);
+                if (curPiece != null && curPiece.getTeamColor() == teamColor) {
+                    allyPositions.add(curPos);
+                }
+            }
+        }
+        return allyPositions;
     }
 
     /**
@@ -197,11 +263,20 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor) && (!isInCheckmate(teamColor))) {
+
+        System.out.println("In isInStalemate");
+        System.out.println(getAllyMoves(teamColor).isEmpty());
+        System.out.println(isInCheck(teamColor));
+
+        ChessPosition kingPos = getKingPos(teamColor);
+        Collection<ChessMove> allValidAlliedMoves = validMoves(kingPos);
+
+        if (allValidAlliedMoves.isEmpty() && !isInCheck(teamColor)) {
             return true;
         }
         return false;
     }
+
 
     /**
      * Sets this game's chessboard with a given board
