@@ -241,7 +241,7 @@ public class ChessGame {
     }
 
     private Collection<ChessPosition> getAllyPositions(TeamColor teamColor) {
-       Collection<ChessPosition> allyPositions = new ArrayList<>();
+        Collection<ChessPosition> allyPositions = new ArrayList<>();
 
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
@@ -265,13 +265,14 @@ public class ChessGame {
     public boolean isInStalemate(TeamColor teamColor) {
 
         System.out.println("In isInStalemate");
-        System.out.println(getAllyMoves(teamColor).isEmpty());
-        System.out.println(isInCheck(teamColor));
+        Collection<ChessMove> allValidMoves = new ArrayList<>();
 
-        ChessPosition kingPos = getKingPos(teamColor);
-        Collection<ChessMove> allValidAlliedMoves = validMoves(kingPos);
+        Collection<ChessPosition> allyPositions = getAllyPositions(teamColor);
+        for (ChessPosition allyPosition : allyPositions) {
+            allValidMoves.addAll(validMoves(allyPosition));
+        }
 
-        if (allValidAlliedMoves.isEmpty() && !isInCheck(teamColor)) {
+        if (!isInCheck(teamColor) && (allValidMoves.isEmpty())) {
             return true;
         }
         return false;
