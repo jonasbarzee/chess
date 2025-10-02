@@ -246,7 +246,7 @@ public class ChessGame {
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition curPos = new ChessPosition(row, col);
-                ChessPiece curPiece = clonedBoard.getPiece(curPos);
+                ChessPiece curPiece = board.getPiece(curPos);
                 if (curPiece != null && curPiece.getTeamColor() == teamColor) {
                     allyPositions.add(curPos);
                 }
@@ -272,6 +272,7 @@ public class ChessGame {
             allValidMoves.addAll(validMoves(allyPosition));
         }
 
+        copyBoard();
         if (!isInCheck(teamColor) && (allValidMoves.isEmpty())) {
             return true;
         }
