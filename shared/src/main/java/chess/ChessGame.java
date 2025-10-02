@@ -100,6 +100,8 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         // Checking to see if there is a ChessPiece at the starting position as to not use a method on a null pointer.
+
+
         if (board.getPiece(move.getStartPosition()) == null) {
             throw new InvalidMoveException("No piece at ChessMove startPos.");
 
@@ -110,8 +112,15 @@ public class ChessGame {
         }
         if (validMoves(move.getStartPosition()).contains(move)) {
             ChessPiece curPiece = board.getPiece(move.getStartPosition());
-            board.addPiece(move.getEndPosition(), curPiece);
-            board.removePiece(move.getStartPosition());
+            if (curPiece.getPieceType() == ChessPiece.PieceType.PAWN && (move.getEndPosition().getRow() == 1 || move.getEndPosition().getRow() == 8)) {
+                System.out.println("Piece is a pawn and we are promoting");
+                board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
+                board.removePiece(move.getStartPosition());
+
+            } else {
+                board.addPiece(move.getEndPosition(), curPiece);
+                board.removePiece(move.getStartPosition());
+            }
         } else {
             throw new InvalidMoveException("error");
         }
