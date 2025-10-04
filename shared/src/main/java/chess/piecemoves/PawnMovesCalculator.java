@@ -34,7 +34,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                     chess.ChessMove moveOnePromo = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + direction, col), promoPiece);
                     validateMoves(moveOnePromo, board, validMoves, false);
                     for (int captureDir : diagDir) {
-                        chess.ChessMove moveCapture = new ChessMove(new ChessPosition(row, col), new ChessPosition(row + direction, col + captureDir), promoPiece);
+                        ChessPosition startPos = new ChessPosition(row, col);
+                        ChessPosition endPos = new ChessPosition(row + direction, col + captureDir);
+                        chess.ChessMove moveCapture = new ChessMove(startPos, endPos, promoPiece);
                         validateMoves(moveCapture, board, validMoves, true);
                     }
                 }

@@ -106,7 +106,7 @@ public class ChessGame {
         ChessPosition endPos = move.getEndPosition();
 
 
-          if (board.getPiece(startPos) == null) {
+        if (board.getPiece(startPos) == null) {
             throw new InvalidMoveException("No piece at ChessMove startPos.");
 
         }
@@ -216,29 +216,29 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         System.out.println("Calling isInCheck from isInCheckmate (first call)");
-        if (isInCheck(teamColor)) {
-            // check all kings moves
-            ChessPosition kingPos = getKingPos(teamColor);
-            Collection<ChessMove> enemyPieceMoves = getEnemyMoves(kingPos);
-            Collection<ChessMove> allyPieceMoves = getAllyMoves(teamColor);
+        if (!isInCheck(teamColor)) { // if king is not in check then king cannot be in checkmate
+            return false;
+        }
 
-            ChessPiece king = board.getPiece(kingPos);
+        // check all possible moves of allied piece to see if king can get out of check
+        ChessPosition kingPos = getKingPos(teamColor);
+        Collection<ChessMove> enemyPieceMoves = getEnemyMoves(kingPos);
+        Collection<ChessMove> allyPieceMoves = getAllyMoves(teamColor);
 
-            for (ChessMove allyMove : allyPieceMoves) {
-                for (ChessMove enemyMove : enemyPieceMoves) {
-                    if (allyMove.getEndPosition().equals(enemyMove.getStartPosition())) {
-                        // do the king move on the simulated board and see if the king is now out of check
-                        makeMoveOnCloneBoard(allyMove);
-                        System.out.println("Calling isInCheck from isInCheckmate (second call)");
-                        if (!isInCheck(teamColor)) {
-                            return false;
-                        }
+        for (ChessMove allyMove : allyPieceMoves) {
+            for (ChessMove enemyMove : enemyPieceMoves) {
+                if (allyMove.getEndPosition().equals(enemyMove.getStartPosition())) {
+                    // do the king move on the simulated board and see if the king is now out of check
+                    makeMoveOnCloneBoard(allyMove);
+                    System.out.println("Calling isInCheck from isInCheckmate (second call)");
+                    if (!isInCheck(teamColor)) {
+                        return false;
                     }
                 }
             }
-            return true;
         }
-        return false;
+        return true;
+
 
     }
 
