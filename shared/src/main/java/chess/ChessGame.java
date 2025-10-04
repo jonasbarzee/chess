@@ -82,7 +82,8 @@ public class ChessGame {
         Collection<ChessMove> curPieceMoves = curPiece.pieceMoves(board, startPosition);
         Collection<ChessMove> curPieceMovesCopy = curPiece.pieceMoves(board, startPosition);
 
-        // make the move on the cloned board, see if the king is in check, if yes then remove the move from the validMoves, if not in check leave the move in the validMoves collection.
+        // make the move on the cloned board, see if the king is in check
+        // if yes then remove the move from the validMoves, if not in check leave the move in the validMoves collection.
         for (ChessMove curMove : curPieceMovesCopy) {
             makeMoveOnCloneBoard(curMove);
             System.out.println("Calling isInCheck from validMoves");
@@ -101,26 +102,27 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         // Checking to see if there is a ChessPiece at the starting position as to not use a method on a null pointer.
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
 
 
-        if (board.getPiece(move.getStartPosition()) == null) {
+          if (board.getPiece(startPos) == null) {
             throw new InvalidMoveException("No piece at ChessMove startPos.");
 
-            // Validating that the current teams turn is the same as the piece that is trying to move as to not move a piece out of its turn.
         }
-        if (getTeamTurn() != board.getPiece(move.getStartPosition()).getTeamColor()) {
+        if (getTeamTurn() != board.getPiece(startPos).getTeamColor()) {
             throw new InvalidMoveException("Trying to move a piece when it is not its teams turn.");
         }
-        if (validMoves(move.getStartPosition()).contains(move)) {
-            ChessPiece curPiece = board.getPiece(move.getStartPosition());
-            if (curPiece.getPieceType() == ChessPiece.PieceType.PAWN && (move.getEndPosition().getRow() == 1 || move.getEndPosition().getRow() == 8)) {
+        if (validMoves(startPos).contains(move)) {
+            ChessPiece curPiece = board.getPiece(startPos);
+            if (curPiece.getPieceType() == ChessPiece.PieceType.PAWN && (endPos.getRow() == 1 || endPos.getRow() == 8)) {
                 System.out.println("Piece is a pawn and we are promoting");
-                board.addPiece(move.getEndPosition(), new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece()));
-                board.removePiece(move.getStartPosition());
+                board.addPiece(endPos, new ChessPiece(board.getPiece(startPos).getTeamColor(), move.getPromotionPiece()));
+                board.removePiece(startPos);
 
             } else {
-                board.addPiece(move.getEndPosition(), curPiece);
-                board.removePiece(move.getStartPosition());
+                board.addPiece(endPos, curPiece);
+                board.removePiece(startPos);
             }
         } else {
             throw new InvalidMoveException("error");

@@ -29,7 +29,7 @@ public class ChessBoard {
     }
 
     public void removePiece(ChessPosition position) {
-        squares[position.getRow() - 1][position.getColumn() - 1] = null; // removing the piece by setting it to null, make sure to add the piece before removing it so it doesn't disappear.
+        squares[position.getRow() - 1][position.getColumn() - 1] = null; // removing the piece by setting it to null
     }
 
     /**

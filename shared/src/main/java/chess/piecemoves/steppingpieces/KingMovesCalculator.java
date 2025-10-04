@@ -11,7 +11,7 @@ import java.util.List;
 
 public class KingMovesCalculator extends SteppingPieceMovesCalculator {
 
-    private static final List<Direction> KING_DIRECTIONS = List.of(Direction.NORTH, Direction.NORTHEAST, Direction.NORTHWEST, Direction.EAST, Direction.WEST, Direction.SOUTH, Direction.SOUTHEAST, Direction.SOUTHWEST);
+    private static final List<Direction> KING_DIRECTIONS = List.of(Direction.values());
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessPosition position, ChessBoard board) {
