@@ -86,7 +86,6 @@ public class ChessGame {
         // if yes then remove the move from the validMoves, if not in check leave the move in the validMoves collection.
         for (ChessMove curMove : curPieceMovesCopy) {
             makeMoveOnCloneBoard(curMove);
-            System.out.println("Calling isInCheck from validMoves");
             if (isInCheck(clonedBoard.getPiece(curMove.getEndPosition()).getTeamColor())) {
                 curPieceMoves.remove(curMove);
             }
@@ -116,7 +115,6 @@ public class ChessGame {
         if (validMoves(startPos).contains(move)) {
             ChessPiece curPiece = board.getPiece(startPos);
             if (curPiece.getPieceType() == ChessPiece.PieceType.PAWN && (endPos.getRow() == 1 || endPos.getRow() == 8)) {
-                System.out.println("Piece is a pawn and we are promoting");
                 board.addPiece(endPos, new ChessPiece(board.getPiece(startPos).getTeamColor(), move.getPromotionPiece()));
                 board.removePiece(startPos);
 
@@ -194,17 +192,14 @@ public class ChessGame {
         // Takes the team color, finds that teams king, finds all enemies and their movesets, verifies that the current team's king is not in check.
         ChessPosition kingPos = getKingPos(teamColor);
         Collection<ChessMove> allPieceMoves = getEnemyMoves(kingPos);
-        System.out.println(board.toString());
-        System.out.println(clonedBoard.toString());
+
 
         for (ChessMove move : allPieceMoves) {
             ChessPosition moveEndPos = move.getEndPosition();
             if (moveEndPos.equals(kingPos)) {
-                System.out.println("Returning true from isInCheck");
                 return true;
             }
         }
-        System.out.println("Returning false from isInCheck");
         return false;
     }
 
@@ -215,7 +210,6 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        System.out.println("Calling isInCheck from isInCheckmate (first call)");
         if (!isInCheck(teamColor)) { // if king is not in check then king cannot be in checkmate
             return false;
         }
@@ -230,7 +224,6 @@ public class ChessGame {
                 if (allyMove.getEndPosition().equals(enemyMove.getStartPosition())) {
                     // do the king move on the simulated board and see if the king is now out of check
                     makeMoveOnCloneBoard(allyMove);
-                    System.out.println("Calling isInCheck from isInCheckmate (second call)");
                     if (!isInCheck(teamColor)) {
                         return false;
                     }
@@ -266,7 +259,6 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
 
-        System.out.println("In isInStalemate");
         Collection<ChessMove> allValidMoves = new ArrayList<>();
 
         Collection<ChessPosition> allyPositions = getAllyPositions(teamColor);
