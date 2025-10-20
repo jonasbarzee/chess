@@ -8,11 +8,12 @@ import java.util.Map;
 public class AuthDataAccess {
     private final Map<String, AuthData> authTable = new HashMap<>();
 
-    public void create(AuthData authData) throws AuthDataAccessException {
+    public AuthData create(AuthData authData) throws AuthDataAccessException {
         if (hasToken(authData.authToken())) {
             throw new AuthDataAccessException("AuthData already exists for given AuthToken");
         }
         authTable.put(authData.authToken(), authData);
+        return authData;
     }
 
     public AuthData get(String authToken) throws AuthDataAccessException {

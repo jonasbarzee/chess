@@ -15,11 +15,11 @@ public class UserDataAccess {
         userTable.put(userData.username(), userData);
     }
 
-    public UserData getUser(String username) throws UserDataAccessException {
-        if (!userTable.containsKey(username)) {
-            throw new UserDataAccessException("User does not exist");
+    public UserData getUser(String username)  {
+        if (userTable.containsKey(username)) {
+            return userTable.get(username);
         }
-        return userTable.get(username);
+        return null;
     }
 
     public void updateUser(UserData userData) throws UserDataAccessException{
