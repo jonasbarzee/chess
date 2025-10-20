@@ -1,10 +1,10 @@
 package service;
 
+import chess.request.LoginRequest;
 import chess.request.RegisterRequest;
+import chess.result.LoginResult;
 import chess.result.RegisterResult;
-import dataaccess.AuthDataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.UserDataAccess;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
@@ -17,19 +17,32 @@ public class UserService {
         this.authDataAccess = authDataAccess;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest, UserData userToReg, AuthData authDataToReg) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException {
+        UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+
         try {
-            UserData userData = userDataAccess.getUser(registerRequest.username());
-            if (userData != null) {
-                throw new AlreadyTakenException("Username is already taken.");
-            }
-            userDataAccess.createUser(userToReg);
-            AuthData authData = authDataAccess.create(authDataToReg);
+            userDataAccess.createUser(userData);
+            AuthData authData = authDataAccess.create(userData.username());
             return new RegisterResult(authData.username(), authData.authToken());
+
         } catch (DataAccessException ex) {
-            return null;
+            throw new AlreadyTakenException("Username is already taken.");
         }
     }
-    // public LoginResult login(LoginRequest loginRequest) {}
+
+    public LoginResult login(LoginRequest loginRequest) throws UserNotRegisteredException, AlreadyTakenException {
+        String username = loginRequest.username();
+        UserData userData = userDataAccess.getUser(username);
+
+        if (userData == null) {
+            throw new UserNotRegisteredException("Given username is not registered.");
+        } else if (!loginRequest.password().equals(userData.password())) {
+            throw new UserNotRegisteredException("Given password was incorrect.");
+        }
+
+        AuthData authData = authDataAccess.update(username);
+        return new LoginResult(authData.authToken(), authData.username());
+
+    }
     // public void logout(LogoutRequest logoutRequest) {}
 }

@@ -2,25 +2,35 @@ package dataaccess;
 
 import model.AuthData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class AuthDataAccess {
-    private final Map<String, AuthData> authTable = new HashMap<>();
+    private final Collection<AuthData> authList = new ArrayList<>();
+    private final Map<String, Collection<AuthData>> authTable = new HashMap<>();
 
-    public AuthData create(AuthData authData) throws AuthDataAccessException {
-        if (hasToken(authData.authToken())) {
-            throw new AuthDataAccessException("AuthData already exists for given AuthToken");
+    public AuthData create(String username) throws AuthDataAccessException {
+        if (hasUsername(username)) {
+            throw new AuthDataAccessException("Username already exists.");
         }
-        authTable.put(authData.authToken(), authData);
+        String authToken = generateToken();
+        AuthData authData = new AuthData(authToken, username);
+        authList.add(authData);
+        authTable.put(authData.username(), authList);
         return authData;
     }
 
-    public AuthData get(String authToken) throws AuthDataAccessException {
-        if (hasToken(authToken)) {
+    public AuthData update(String username) {
+        String authToken = generateToken();
+        AuthData authData = new AuthData(authToken, username);
+        authTable.put(authData.username(), authList);
+        return authData;
+    }
+
+    public Collection<AuthData> get(String username) throws AuthDataAccessException {
+        if (hasUsername(username)) {
             throw new AuthDataAccessException("No AuthData for given AuthToken.");
         }
-        return authTable.get(authToken);
+        return authTable.get(username);
     }
 
     public void delete(String authToken) {
@@ -31,7 +41,11 @@ public class AuthDataAccess {
         authTable.clear();
     }
 
-    public boolean hasToken(String authToken) {
-        return authTable.containsKey(authToken);
+    public boolean hasUsername(String username) {
+        return authTable.containsKey(username);
+    }
+
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }

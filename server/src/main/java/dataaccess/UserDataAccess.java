@@ -15,7 +15,7 @@ public class UserDataAccess {
         userTable.put(userData.username(), userData);
     }
 
-    public UserData getUser(String username)  {
+    public UserData getUser(String username) {
         if (userTable.containsKey(username)) {
             return userTable.get(username);
         }
