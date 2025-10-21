@@ -33,6 +33,28 @@ public class AuthDataAccess {
         return authTable.get(username);
     }
 
+    public String getUsername(String authToken) throws AuthDataAccessException {
+        for (Collection<AuthData> authList : authTable.values()) {
+            for (AuthData authData : authList) {
+                if (authData.authToken().equals(authToken)) {
+                    return authData.username();
+                }
+            }
+        }
+        throw new AuthDataAccessException("Unauthorized.");
+    }
+
+    public boolean isAuthorized(String authToken) {
+        for (Collection<AuthData> authList : authTable.values()) {
+            for (AuthData authData : authList) {
+                if (authData.authToken().equals(authToken)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void delete(String authToken) {
         for (Collection<AuthData> authList : authTable.values()) {
             for (AuthData authData : authList) {
