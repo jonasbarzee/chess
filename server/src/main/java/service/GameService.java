@@ -1,4 +1,4 @@
 package service;
 
-public class GameService {
+public class GameService { 
 }

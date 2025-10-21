@@ -27,7 +27,7 @@ public class AuthDataAccess {
     }
 
     public Collection<AuthData> get(String username) throws AuthDataAccessException {
-        if (hasUsername(username)) {
+        if (!hasUsername(username)) {
             throw new AuthDataAccessException("No AuthData for given username.");
         }
         return authTable.get(username);
@@ -44,7 +44,7 @@ public class AuthDataAccess {
     }
 
 
-    public void deleteAll() {
+    public void deleteAllAuthData() {
         authTable.clear();
     }
 

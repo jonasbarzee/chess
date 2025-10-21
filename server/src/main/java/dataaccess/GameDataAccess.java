@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GamaDataAccess {
+public class GameDataAccess {
     private final Map<Integer, GameData> gameTable = new HashMap<>();
 
     public void createGameData(GameData gameData) {
@@ -18,7 +18,7 @@ public class GamaDataAccess {
     }
 
     public GameData getGame(int gameID) throws GameDataAccessException {
-        if (hasGame(gameID)) {
+        if (!hasGame(gameID)) {
             throw new GameDataAccessException("No game with given gameID.");
         }
         return gameTable.get(gameID);
