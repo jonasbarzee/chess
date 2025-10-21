@@ -15,13 +15,11 @@ public class GameService {
 
     private final GameDataAccess gameDataAccess;
     private final AuthDataAccess authDataAccess;
-    private final UserDataAccess userDataAccess;
     private Integer gameID = -1;
 
     public GameService(GameDataAccess gameDataAccess, AuthDataAccess authDataAccess, UserDataAccess userDataAccess) {
         this.gameDataAccess = gameDataAccess;
         this.authDataAccess = authDataAccess;
-        this.userDataAccess = userDataAccess;
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws UnauthorizedException {
@@ -76,9 +74,11 @@ public class GameService {
                         case ("white"):
                             GameData gameDataToUpdateWhite = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
                             gameDataAccess.updateGameData(gameDataToUpdateWhite);
+                            break;
                         case ("black"):
                             GameData gameDataToUpdateBlack = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
                             gameDataAccess.updateGameData(gameDataToUpdateBlack);
+                            break;
                     }
                     return new JoinGameResult();
                 }
