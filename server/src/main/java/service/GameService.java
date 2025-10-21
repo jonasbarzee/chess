@@ -3,13 +3,18 @@ package service;
 import chess.ChessGame;
 import chess.request.CreateGameRequest;
 import chess.request.JoinGameRequest;
+import chess.request.ListGamesRequest;
 import chess.result.CreateGameResult;
 import chess.result.JoinGameResult;
+import chess.result.ListGamesResult;
 import dataaccess.AuthDataAccess;
 import dataaccess.GameDataAccess;
 import dataaccess.GameDataAccessException;
 import dataaccess.UserDataAccess;
 import model.GameData;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class GameService {
 
@@ -87,6 +92,16 @@ public class GameService {
             } catch (GameDataAccessException ex) {
                 throw new GameDataAccessException("No game with the given gameID.");
             }
+        }
+        throw new UnauthorizedException("Unauthorized.");
+    }
+
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException {
+        String authToken = listGamesRequest.authToken();
+
+        if (authDataAccess.isAuthorized(authToken)) {
+            Collection<GameData> games = gameDataAccess.getGames();
+            return new ListGamesResult(games);
         }
         throw new UnauthorizedException("Unauthorized.");
     }

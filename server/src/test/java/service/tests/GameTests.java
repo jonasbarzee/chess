@@ -2,7 +2,9 @@ package service.tests;
 
 import chess.request.CreateGameRequest;
 import chess.request.JoinGameRequest;
+import chess.request.ListGamesRequest;
 import chess.result.CreateGameResult;
+import chess.result.ListGamesResult;
 import dataaccess.AuthDataAccess;
 import dataaccess.GameDataAccess;
 import dataaccess.UserDataAccess;
@@ -13,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import service.AlreadyTakenException;
 import service.GameService;
 import service.UnauthorizedException;
-import service.UserNotRegisteredException;
 
 public class GameTests {
 
@@ -86,7 +87,7 @@ public class GameTests {
         Assertions.assertDoesNotThrow(() -> {
             userDataAccess.createUser(userData);
             AuthData authData = authDataAccess.create(userData.username());
-            CreateGameRequest createGameRequest = new CreateGameRequest("mygame", authData.authToken());
+            CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authData.authToken());
             CreateGameResult createGameResult = gameService.createGame(createGameRequest);
             JoinGameRequest joinGameRequest = new JoinGameRequest(authData.authToken(), "BLACK", createGameResult.gameID());
             gameService.joinGame(joinGameRequest);
@@ -106,7 +107,7 @@ public class GameTests {
         Assertions.assertDoesNotThrow(() -> {
             userDataAccess.createUser(userData);
             AuthData authData = authDataAccess.create(userData.username());
-            CreateGameRequest createGameRequest = new CreateGameRequest("mygame", authData.authToken());
+            CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authData.authToken());
             CreateGameResult createGameResult = gameService.createGame(createGameRequest);
             JoinGameRequest joinGameRequest = new JoinGameRequest(authData.authToken(), "white", createGameResult.gameID());
             gameService.joinGame(joinGameRequest);
@@ -119,6 +120,61 @@ public class GameTests {
                 gameService.joinGame(joinGameRequest1);
             });
         });
+    }
 
+    @Test
+    public void getGamesSuccess() {
+        gameDataAccess = new GameDataAccess();
+        authDataAccess = new AuthDataAccess();
+        userDataAccess = new UserDataAccess();
+        gameService = new GameService(gameDataAccess, authDataAccess, userDataAccess);
+
+        UserData userData = new UserData("username", "password", "email@email.com");
+        UserData userData1 = new UserData("username1", "password1", "email1@email.com");
+
+        Assertions.assertDoesNotThrow(() -> {
+            userDataAccess.createUser(userData);
+            AuthData authData = authDataAccess.create(userData.username());
+            CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authData.authToken());
+            CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(authData.authToken(), "white", createGameResult.gameID());
+            gameService.joinGame(joinGameRequest);
+
+            userDataAccess.createUser(userData1);
+            AuthData authData1 = authDataAccess.create(userData1.username());
+            JoinGameRequest joinGameRequest1 = new JoinGameRequest(authData1.authToken(), "black", createGameResult.gameID());
+            gameService.joinGame(joinGameRequest1);
+
+            ListGamesRequest listGamesRequest = new ListGamesRequest(authData.authToken());
+            ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+
+            Assertions.assertNotNull(listGamesResult);
+            Assertions.assertNotNull(listGamesResult.games());
+        });
+    }
+
+    @Test
+    public void getGamesFailureUnauthorized() {
+        gameDataAccess = new GameDataAccess();
+        authDataAccess = new AuthDataAccess();
+        userDataAccess = new UserDataAccess();
+        gameService = new GameService(gameDataAccess, authDataAccess, userDataAccess);
+
+
+        UserData userData = new UserData("username", "password", "email@email.com");
+        UserData userData1 = new UserData("username1", "password1", "email1@email.com");
+
+        Assertions.assertDoesNotThrow(() -> {
+            userDataAccess.createUser(userData);
+            AuthData authData = authDataAccess.create(userData.username());
+            CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authData.authToken());
+            CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+
+            Assertions.assertThrows(UnauthorizedException.class, () -> {
+
+                ListGamesRequest listGamesRequest = new ListGamesRequest(authDataAccess.generateToken());
+                gameService.listGames(listGamesRequest);
+            });
+        });
     }
 }
