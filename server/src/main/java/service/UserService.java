@@ -1,8 +1,10 @@
 package service;
 
 import chess.request.LoginRequest;
+import chess.request.LogoutRequest;
 import chess.request.RegisterRequest;
 import chess.result.LoginResult;
+import chess.result.LogoutResult;
 import chess.result.RegisterResult;
 import dataaccess.*;
 import model.AuthData;
@@ -44,5 +46,11 @@ public class UserService {
         return new LoginResult(authData.authToken(), authData.username());
 
     }
-    // public void logout(LogoutRequest logoutRequest) {}
+
+    public LogoutResult logout(LogoutRequest logoutRequest) {
+        String authToken = logoutRequest.authToken();
+        authDataAccess.delete(authToken);
+        return new LogoutResult();
+
+    }
 }

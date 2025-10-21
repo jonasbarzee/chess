@@ -28,14 +28,21 @@ public class AuthDataAccess {
 
     public Collection<AuthData> get(String username) throws AuthDataAccessException {
         if (hasUsername(username)) {
-            throw new AuthDataAccessException("No AuthData for given AuthToken.");
+            throw new AuthDataAccessException("No AuthData for given username.");
         }
         return authTable.get(username);
     }
 
     public void delete(String authToken) {
-        authTable.remove(authToken);
+        for (Collection<AuthData> authList : authTable.values()) {
+            for (AuthData authData : authList) {
+                if (authData.authToken().equals(authToken)) {
+                    authList.remove(authToken);
+                }
+            }
+        }
     }
+
 
     public void deleteAll() {
         authTable.clear();
