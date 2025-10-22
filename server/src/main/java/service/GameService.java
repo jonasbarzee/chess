@@ -75,42 +75,41 @@ public class GameService {
             throw new BadRequestException("Bad Request.");
         }
         playerColor = playerColor.toLowerCase();
-        if (playerColor.isEmpty() || !playerColor.equals( "white" ) && !playerColor.equals("black")) {
+        if (playerColor.isEmpty() || !playerColor.equals("white") && !playerColor.equals("black")) {
             throw new BadRequestException("Bad request.");
         }
 
         String username;
         try {
-             username = authDataAccess.getUsername(authToken);
+            username = authDataAccess.getUsername(authToken);
         } catch (DataAccessException ex) {
             throw new UnauthorizedException("Bad Request.");
         }
 
         if (authDataAccess.isAuthorized(authToken)) {
+            GameData gameData;
             try {
-                GameData gameData = gameDataAccess.getGame(gameID);
-
-                if (canJoinAsColor(playerColor, gameID)) {
-
-                    switch (playerColor) {
-                        case ("white"):
-                            GameData gameDataToUpdateWhite = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
-                            gameDataAccess.updateGameData(gameDataToUpdateWhite);
-                            break;
-                        case ("black"):
-                            GameData gameDataToUpdateBlack = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
-                            gameDataAccess.updateGameData(gameDataToUpdateBlack);
-                            break;
-                        default:
-                            throw new BadRequestException("Bad Request.");
-                    }
-                    return new JoinGameResult();
-                }
-                throw new AlreadyTakenException("Cannot join with given player color.");
-
-            } catch (ServiceException ex) {
+                gameData = gameDataAccess.getGame(gameID);
+            } catch (GameDataAccessException ex) {
                 throw new GameDataAccessException("No game with the given gameID.");
             }
+            if (canJoinAsColor(playerColor, gameID)) {
+
+                switch (playerColor) {
+                    case ("white"):
+                        GameData gameDataToUpdateWhite = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
+                        gameDataAccess.updateGameData(gameDataToUpdateWhite);
+                        break;
+                    case ("black"):
+                        GameData gameDataToUpdateBlack = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
+                        gameDataAccess.updateGameData(gameDataToUpdateBlack);
+                        break;
+                    default:
+                        throw new BadRequestException("Bad Request.");
+                }
+                return new JoinGameResult();
+            }
+            throw new AlreadyTakenException("Cannot join with given player color.");
         }
         throw new UnauthorizedException("Unauthorized.");
     }

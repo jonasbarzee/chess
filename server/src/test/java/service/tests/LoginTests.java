@@ -12,6 +12,7 @@ import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.NoUserException;
+import service.UnauthorizedException;
 import service.WrongPasswordException;
 import service.UserService;
 
@@ -148,13 +149,13 @@ public class LoginTests {
 
         LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThrows(UnauthorizedException.class, () -> {
             LoginResult loginResult = userService.login(loginRequest);
             Assertions.assertNotNull(loginResult);
             Assertions.assertNotNull(loginResult.authToken());
             Assertions.assertNotNull(loginResult.username());
 
-            LogoutRequest logoutRequest = new LogoutRequest(null);
+            LogoutRequest logoutRequest = new LogoutRequest("");
             LogoutResult logoutResult = userService.logout(logoutRequest);
 
             LogoutResult expected = new LogoutResult();
