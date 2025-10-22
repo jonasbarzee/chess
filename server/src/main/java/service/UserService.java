@@ -32,14 +32,15 @@ public class UserService {
         }
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws UserNotRegisteredException, AlreadyTakenException {
+    public LoginResult login(LoginRequest loginRequest) throws NoUserException, WrongPasswordException {
+        System.out.println("in the login method!!");
         String username = loginRequest.username();
         UserData userData = userDataAccess.getUser(username);
 
         if (userData == null) {
-            throw new UserNotRegisteredException("Given username is not registered.");
+            throw new NoUserException("Given username is not registered.");
         } else if (!loginRequest.password().equals(userData.password())) {
-            throw new UserNotRegisteredException("Given password was incorrect.");
+            throw new WrongPasswordException("Given password was incorrect.");
         }
 
         AuthData authData = authDataAccess.update(username);

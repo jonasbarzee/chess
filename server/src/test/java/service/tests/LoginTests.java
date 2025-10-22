@@ -11,7 +11,8 @@ import dataaccess.UserDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import service.UserNotRegisteredException;
+import service.NoUserException;
+import service.WrongPasswordException;
 import service.UserService;
 
 public class LoginTests {
@@ -66,7 +67,7 @@ public class LoginTests {
 
         LoginRequest loginRequest = new LoginRequest("wrong username", userData.password());
 
-        Assertions.assertThrows(UserNotRegisteredException.class, () -> {
+        Assertions.assertThrows(NoUserException.class, () -> {
             userService.login(loginRequest);
         });
     }
@@ -90,7 +91,7 @@ public class LoginTests {
 
         LoginRequest loginRequest = new LoginRequest(userData.username(), "wrong password");
 
-        Assertions.assertThrows(UserNotRegisteredException.class, () -> {
+        Assertions.assertThrows(WrongPasswordException.class, () -> {
             userService.login(loginRequest);
         });
     }

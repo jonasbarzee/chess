@@ -9,9 +9,9 @@ public class AuthDataAccess {
     private final Map<String, Collection<AuthData>> authTable = new HashMap<>();
 
     public AuthData create(String username) throws AuthDataAccessException {
-        if (hasUsername(username)) {
-            throw new AuthDataAccessException("Username already exists.");
-        }
+//        if (hasUsername(username)) {
+//            throw new AuthDataAccessException("Username already exists.");
+//        }
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, username);
         authList.add(authData);

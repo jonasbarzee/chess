@@ -8,9 +8,9 @@ import java.util.Map;
 public class UserDataAccess {
     private final Map<String, UserData> userTable = new HashMap<>();
 
-    public void createUser(UserData userData) throws UserDataAccessException {
-        if (userTable.containsKey(userData.username())) {
-            throw new UserDataAccessException("User already exists");
+    public void createUser(UserData userData) throws DataAccessException {
+        if (getUser(userData.username()) != null) {
+            throw new DataAccessException("User already exists");
         }
         userTable.put(userData.username(), userData);
     }
@@ -23,7 +23,7 @@ public class UserDataAccess {
     }
 
     public void updateUser(UserData userData) throws UserDataAccessException{
-        if (!userTable.containsKey(userData.username())) {
+        if (getUser(userData.username()) == null) {
             throw new UserDataAccessException("User does not exist");
         }
         userTable.put(userData.username(), userData);
