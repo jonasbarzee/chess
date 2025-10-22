@@ -1,10 +1,7 @@
 package dataaccess;
 
-public class AuthDataAccessException extends GameDataAccessException {
+public class AuthDataAccessException extends DataAccessException {
     public AuthDataAccessException(String message) {
         super(message);
-    }
-    public AuthDataAccessException(String message, Throwable ex) {
-        super(message, ex);
     }
 }

@@ -5,63 +5,61 @@ import model.AuthData;
 import java.util.*;
 
 public class AuthDataAccess {
-    private final Collection<AuthData> authList = new ArrayList<>();
-    private final Map<String, Collection<AuthData>> authTable = new HashMap<>();
+    private final Map<String, AuthData> authTable = new HashMap<>();
 
     public AuthData create(String username) throws AuthDataAccessException {
-//        if (hasUsername(username)) {
-//            throw new AuthDataAccessException("Username already exists.");
-//        }
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, username);
-        authList.add(authData);
-        authTable.put(authData.username(), authList);
+        authTable.put(authData.authToken(), authData);
         return authData;
     }
 
     public AuthData update(String username) {
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, username);
-        authTable.put(authData.username(), authList);
+        authTable.put(authData.authToken(), authData);
         return authData;
     }
 
-    public Collection<AuthData> get(String username) throws AuthDataAccessException {
-        if (!hasUsername(username)) {
-            throw new AuthDataAccessException("No AuthData for given username.");
+    public AuthData get(String authToken) throws AuthDataAccessException {
+        if (!isAuthorized(authToken)) {
+            throw new AuthDataAccessException("Unauthorized");
         }
-        return authTable.get(username);
+        return authTable.get(authToken);
     }
 
     public String getUsername(String authToken) throws AuthDataAccessException {
-        for (Collection<AuthData> authList : authTable.values()) {
-            for (AuthData authData : authList) {
-                if (authData.authToken().equals(authToken)) {
-                    return authData.username();
-                }
+        for (AuthData authData : authTable.values()) {
+            if (authData.authToken().equals(authToken)) {
+                return authData.username();
             }
         }
-        throw new AuthDataAccessException("Unauthorized.");
+        throw new AuthDataAccessException("Unauthorized");
     }
 
-    public boolean isAuthorized(String authToken) {
-        for (Collection<AuthData> authList : authTable.values()) {
-            for (AuthData authData : authList) {
-                if (authData.authToken().equals(authToken)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    public boolean isAuthorized(String authToken) {
+//        for (Collection<AuthData> authList : authTable.values()) {
+//            for (AuthData authData : authList) {
+//                if (authData.authToken().equals(authToken)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     public void delete(String authToken) {
-        for (Collection<AuthData> authList : authTable.values()) {
-            for (AuthData authData : authList) {
-                if (authData.authToken().equals(authToken)) {
-                    authList.remove(authToken);
-                }
+        String usernameToDelete = null;
+
+        System.out.println("in delete");
+        for (Map.Entry<String, AuthData> entry : authTable.entrySet()) {
+            if (entry.getValue().authToken().equals(authToken)) {
+                usernameToDelete = entry.getKey();
+                break;
             }
+        }
+        if (usernameToDelete != null) {
+            authTable.remove(usernameToDelete);
         }
     }
 
@@ -70,8 +68,8 @@ public class AuthDataAccess {
         authTable.clear();
     }
 
-    public boolean hasUsername(String username) {
-        return authTable.containsKey(username);
+    public boolean isAuthorized(String authToken) {
+        return authTable.containsKey(authToken);
     }
 
     public static String generateToken() {

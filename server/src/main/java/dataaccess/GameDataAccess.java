@@ -17,7 +17,7 @@ public class GameDataAccess {
         createGameData(gameData);
     }
 
-    public GameData getGame(int gameID) throws GameDataAccessException {
+    public GameData getGame(Integer gameID) throws GameDataAccessException {
         if (!hasGame(gameID)) {
             throw new GameDataAccessException("No game with given gameID.");
         }
@@ -36,7 +36,7 @@ public class GameDataAccess {
         gameTable.clear();
     }
 
-    public boolean hasGame(int gameID) {
+    public boolean hasGame(Integer gameID) {
         return gameTable.containsKey(gameID);
     }
 }

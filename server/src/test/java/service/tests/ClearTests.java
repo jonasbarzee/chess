@@ -23,8 +23,7 @@ public class ClearTests {
         authDataAccess = new AuthDataAccess();
         clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
 
-        ClearDatabaseRequest clearDatabaseRequest = new ClearDatabaseRequest();
-        clearService.clearDatabase(clearDatabaseRequest);
+        clearService.clearDatabase();
 
         Assertions.assertThrows(UserDataAccessException.class, () -> {
             UserData userData = new UserData("username", "password", "email@email.com");
@@ -55,7 +54,7 @@ public class ClearTests {
         UserData userData1 = new UserData("default", "password", "email@email.com");
         UserData userData2 = new UserData("", "password", "email@email.com");
 
-        GameData gameData = new GameData(0, "", "", "", new ChessGame());
+        GameData gameData = new GameData(0,"", "", "", new ChessGame());
         GameData gameData1 = new GameData(1, "", "", "", new ChessGame());
         GameData gameData2 = new GameData(10, "", "", "", new ChessGame());
 
@@ -74,8 +73,7 @@ public class ClearTests {
         });
 
 
-        ClearDatabaseRequest clearDatabaseRequest = new ClearDatabaseRequest();
-        clearService.clearDatabase(clearDatabaseRequest);
+        clearService.clearDatabase();
 
         Assertions.assertThrows(UserDataAccessException.class, () -> {
             userDataAccess.updateUser(userData);

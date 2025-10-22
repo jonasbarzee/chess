@@ -18,10 +18,12 @@ public class ListGamesHandler implements Handler {
 
     @Override
     public void handle(Context context) throws Exception {
-        ListGamesRequest listGamesRequest = context.bodyAsClass(ListGamesRequest.class);
-        ListGamesResult listGamesResult;
         try {
-            listGamesResult = gameService.listGames(listGamesRequest);
+            String authToken = context.header("authorization");
+            System.out.println("Raw request body: " + context.body());
+            System.out.println(authToken);
+            ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+            ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
             context.json(listGamesResult);
             context.status(200);
         } catch (Exception ex) {

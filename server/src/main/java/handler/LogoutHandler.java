@@ -21,10 +21,13 @@ public class LogoutHandler implements Handler {
 
     @Override
     public void handle(Context context) throws Exception {
-        LogoutRequest logoutRequest = context.bodyAsClass(LogoutRequest.class);
-        LogoutResult logoutResult;
+
         try {
-            logoutResult = userService.logout(logoutRequest);
+            System.out.println("In logout handler handle method");
+            System.out.println("Raw request body: " + context.body());
+            String authToken = context.header("authorization");
+            LogoutRequest logoutRequest = new LogoutRequest(authToken);
+            LogoutResult logoutResult = userService.logout(logoutRequest);
             context.json(logoutResult);
             context.status(200);
 

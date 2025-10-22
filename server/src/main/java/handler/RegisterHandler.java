@@ -18,13 +18,11 @@ public class RegisterHandler implements Handler {
     }
     @Override
     public void handle(Context context) throws Exception {
-
-        System.out.println("Raw request body: " + context.body());
-
-        RegisterRequest registerRequest = context.bodyAsClass(RegisterRequest.class);
-        RegisterResult registerResult;
-        System.out.println("RegisterHandler handle invoked!");
         try {
+            System.out.println("Raw request body: " + context.body());
+            RegisterRequest registerRequest = context.bodyAsClass(RegisterRequest.class);
+            RegisterResult registerResult;
+            System.out.println("RegisterHandler handle invoked!");
             registerResult = userService.register(registerRequest);
 
             System.out.println("Register result" + registerResult);

@@ -10,7 +10,7 @@ public class UserDataAccess {
 
     public void createUser(UserData userData) throws DataAccessException {
         if (getUser(userData.username()) != null) {
-            throw new DataAccessException("User already exists");
+            throw new UserDataAccessException("User already exists");
         }
         userTable.put(userData.username(), userData);
     }
@@ -20,6 +20,10 @@ public class UserDataAccess {
             return userTable.get(username);
         }
         return null;
+    }
+
+    public boolean userExists(String username) {
+        return userTable.containsKey(username);
     }
 
     public void updateUser(UserData userData) throws UserDataAccessException{

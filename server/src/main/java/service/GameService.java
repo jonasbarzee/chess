@@ -20,14 +20,19 @@ public class GameService {
 
     private final GameDataAccess gameDataAccess;
     private final AuthDataAccess authDataAccess;
-    private Integer gameID = -1;
+    private Integer gameID = 0;
 
     public GameService(GameDataAccess gameDataAccess, AuthDataAccess authDataAccess, UserDataAccess userDataAccess) {
         this.gameDataAccess = gameDataAccess;
         this.authDataAccess = authDataAccess;
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws UnauthorizedException {
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException {
+
+        if (createGameRequest.gameName() == null) {
+            throw new BadRequestException("gameName is null");
+        }
+
         if (authDataAccess.isAuthorized(createGameRequest.authToken())) {
             gameID += 1;
             GameData gameData = new GameData(gameID, null, null, createGameRequest.gameName(), new ChessGame());
@@ -89,7 +94,7 @@ public class GameService {
                 }
                 throw new AlreadyTakenException("Cannot join with given player color.");
 
-            } catch (GameDataAccessException ex) {
+            } catch (Exception ex) {
                 throw new GameDataAccessException("No game with the given gameID.");
             }
         }

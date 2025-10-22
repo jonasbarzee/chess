@@ -1,5 +1,6 @@
 package handler;
 
+import chess.request.JoinGameRequestBody;
 import chess.request.JoinGameRequest;
 import chess.result.JoinGameResult;
 import io.javalin.http.Context;
@@ -18,10 +19,19 @@ public class JoinGameHandler implements Handler {
 
     @Override
     public void handle(Context context) throws Exception{
-        JoinGameRequest joinGameRequest = context.bodyAsClass(JoinGameRequest.class);
-        JoinGameResult joinGameResult;
+
         try {
-            joinGameResult = gameService.joinGame(joinGameRequest);
+            System.out.println("Raw request body: " + context.body());
+            String authToken = context.header("authorization");
+            System.out.println(authToken);
+
+            JoinGameRequestBody joinGameRequestBody = context.bodyAsClass(JoinGameRequestBody.class);
+            System.out.println(joinGameRequestBody.gameID());
+            System.out.println(joinGameRequestBody.playerColor());
+
+
+            JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, joinGameRequestBody.playerColor(), joinGameRequestBody.gameID());
+            JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
             context.json(joinGameResult);
             context.status(200);
 

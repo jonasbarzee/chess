@@ -5,8 +5,8 @@ import chess.result.ClearDatabaseResult;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import service.ClearService;
-import service.GameService;
-import service.UserService;
+
+import java.util.Map;
 
 public class ClearHandler implements Handler {
 
@@ -18,12 +18,12 @@ public class ClearHandler implements Handler {
         this.errorHandler = errorHandler;
     }
 
-    public void handle(Context context) {
-        ClearDatabaseRequest clearDatabaseRequest = context.bodyAsClass(ClearDatabaseRequest.class);
-        ClearDatabaseResult clearDatabaseResult = clearService.clearDatabase(clearDatabaseRequest);
-
+    @Override
+    public void handle(Context context) throws Exception {
         try {
-            context.json(clearDatabaseResult);
+            System.out.println("Raw request body: " + context.body());
+            clearService.clearDatabase();
+            context.json(Map.of());
             context.status(200);
         } catch (Exception ex) {
             errorHandler.handleError(context, ex);
