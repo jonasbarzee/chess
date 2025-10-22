@@ -8,10 +8,7 @@ import chess.result.CreateGameResult;
 import chess.result.JoinGameResult;
 import chess.result.ListGamesResult;
 import chess.result.ListGamesResultBuilder;
-import dataaccess.AuthDataAccess;
-import dataaccess.GameDataAccess;
-import dataaccess.GameDataAccessException;
-import dataaccess.UserDataAccess;
+import dataaccess.*;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -44,7 +41,7 @@ public class GameService {
     }
 
 
-    private boolean canJoinAsColor(String color, Integer gameID) throws GameDataAccessException {
+    private boolean canJoinAsColor(String color, Integer gameID) throws BadRequestException {
         try {
             GameData gameData = gameDataAccess.getGame(gameID);
 
@@ -64,24 +61,38 @@ public class GameService {
             }
 
         } catch (GameDataAccessException ex) {
-            throw new GameDataAccessException("Game doesn't exist.");
+            throw new BadRequestException("Bad Request.");
         }
         return false;
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws UnauthorizedException, AlreadyTakenException, GameDataAccessException {
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws UnauthorizedException, AlreadyTakenException, GameDataAccessException, BadRequestException {
         String authToken = joinGameRequest.authToken();
         Integer gameID = joinGameRequest.gameID();
+        String playerColor = joinGameRequest.playerColor();
+
+        if (gameID == null || authToken == null || playerColor == null) {
+            throw new BadRequestException("Bad Request.");
+        }
+        playerColor = playerColor.toLowerCase();
+        if (playerColor.isEmpty() || !playerColor.equals( "white" ) && !playerColor.equals("black")) {
+            throw new BadRequestException("Bad request.");
+        }
+
+        String username;
+        try {
+             username = authDataAccess.getUsername(authToken);
+        } catch (DataAccessException ex) {
+            throw new UnauthorizedException("Bad Request.");
+        }
 
         if (authDataAccess.isAuthorized(authToken)) {
             try {
                 GameData gameData = gameDataAccess.getGame(gameID);
-                String joinColor = joinGameRequest.playerColor();
 
-                if (canJoinAsColor(joinColor, gameID)) {
-                    String username = authDataAccess.getUsername(authToken);
+                if (canJoinAsColor(playerColor, gameID)) {
 
-                    switch (joinColor.toLowerCase()) {
+                    switch (playerColor) {
                         case ("white"):
                             GameData gameDataToUpdateWhite = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
                             gameDataAccess.updateGameData(gameDataToUpdateWhite);
@@ -90,12 +101,14 @@ public class GameService {
                             GameData gameDataToUpdateBlack = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
                             gameDataAccess.updateGameData(gameDataToUpdateBlack);
                             break;
+                        default:
+                            throw new BadRequestException("Bad Request.");
                     }
                     return new JoinGameResult();
                 }
                 throw new AlreadyTakenException("Cannot join with given player color.");
 
-            } catch (Exception ex) {
+            } catch (ServiceException ex) {
                 throw new GameDataAccessException("No game with the given gameID.");
             }
         }
