@@ -7,6 +7,7 @@ import chess.request.ListGamesRequest;
 import chess.result.CreateGameResult;
 import chess.result.JoinGameResult;
 import chess.result.ListGamesResult;
+import chess.result.ListGamesResultBuilder;
 import dataaccess.AuthDataAccess;
 import dataaccess.GameDataAccess;
 import dataaccess.GameDataAccessException;
@@ -105,8 +106,13 @@ public class GameService {
         String authToken = listGamesRequest.authToken();
 
         if (authDataAccess.isAuthorized(authToken)) {
-            Collection<GameData> games = gameDataAccess.getGames();
-            return new ListGamesResult(games);
+            Collection<GameData> gamesData = gameDataAccess.getGames();
+            Collection<ListGamesResultBuilder> listForResult = new ArrayList<>();
+            for (GameData gameData : gamesData) {
+                ListGamesResultBuilder listGamesResultBuilder = new ListGamesResultBuilder(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName());
+                listForResult.add(listGamesResultBuilder);
+            }
+            return new ListGamesResult(listForResult);
         }
         throw new UnauthorizedException("Unauthorized.");
     }
