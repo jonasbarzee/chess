@@ -14,21 +14,14 @@ public class LoginHandler implements Handler {
     public LoginHandler(UserService userService, ErrorHandler errorHandler) {
         this.userService = userService;
         this.errorHandler = errorHandler;
-        System.out.println("Login handler invoked!!");
     }
     @Override
     public void handle(Context context) throws Exception {
 
-        System.out.println("Raw request body: " + context.body());
 
         try {
             LoginRequest loginRequest = context.bodyAsClass(LoginRequest.class);
-            System.out.println("Parsed login request" + loginRequest);
-            LoginResult loginResult;
-            loginResult = userService.login(loginRequest);
-
-            System.out.println("login result" + loginResult);
-            System.out.println("auth token" + loginResult.authToken());
+            LoginResult loginResult = userService.login(loginRequest);
             context.json(loginResult);
             context.status(200);
         } catch (Exception ex) {

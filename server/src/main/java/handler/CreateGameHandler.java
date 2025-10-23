@@ -21,13 +21,9 @@ public class CreateGameHandler implements Handler {
     @Override
     public void handle(Context context) throws Exception {
         try {
-            System.out.println("Raw request body: " + context.body());
             String authToken = context.header("authorization");
-            System.out.println(authToken);
             Map<String, String> body = context.bodyAsClass(Map.class);
-            System.out.println(body);
             String gameName = body.get("gameName");
-            System.out.println(gameName);
             CreateGameRequest createGameRequest = new CreateGameRequest(gameName, authToken);
             CreateGameResult createGameResult = gameService.createGame(createGameRequest);
             context.status(200).json(createGameResult);

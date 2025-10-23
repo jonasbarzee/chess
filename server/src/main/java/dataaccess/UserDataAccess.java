@@ -26,15 +26,11 @@ public class UserDataAccess {
         return userTable.containsKey(username);
     }
 
-    public void updateUser(UserData userData) throws UserDataAccessException{
+    public void updateUser(UserData userData) throws UserDataAccessException {
         if (getUser(userData.username()) == null) {
             throw new UserDataAccessException("User does not exist");
         }
         userTable.put(userData.username(), userData);
-    }
-
-    public void deleteUser(String username) {
-        userTable.remove(username);
     }
 
     public void deleteAllUsers() {

@@ -37,21 +37,9 @@ public class AuthDataAccess {
         throw new AuthDataAccessException("Unauthorized");
     }
 
-//    public boolean isAuthorized(String authToken) {
-//        for (Collection<AuthData> authList : authTable.values()) {
-//            for (AuthData authData : authList) {
-//                if (authData.authToken().equals(authToken)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-
     public void delete(String authToken) {
         String usernameToDelete = null;
 
-        System.out.println("in delete");
         for (Map.Entry<String, AuthData> entry : authTable.entrySet()) {
             if (entry.getValue().authToken().equals(authToken)) {
                 usernameToDelete = entry.getKey();

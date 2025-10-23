@@ -17,26 +17,9 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        System.out.println("In the server method of the server class!!");
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson());
-        });
-
-        javalin.before(ctx -> {
-            System.out.println("Incoming " + ctx.method() + " " + ctx.path());
-        });
-
-        javalin.after(ctx -> {
-            if (ctx.status().getCode() == 404) {
-                System.out.println("No handler matched " + ctx.method() + " " + ctx.path());
-            }
-        });
-
-        javalin.after(ctx -> {
-            if (ctx.status().getCode() == 200) {
-                System.out.println("handler matched " + ctx.method() + " " + ctx.path());
-            }
         });
 
         // Register your endpoints and exception handlers here.
@@ -58,15 +41,6 @@ public class Server {
         javalin.get("/game", new ListGamesHandler(gameService, errorHandler));
         javalin.post("/game", new CreateGameHandler(gameService, errorHandler));
         javalin.put("/game", new JoinGameHandler(gameService, errorHandler));
-
-
-        javalin.exception(Exception.class, (e, ctx) -> {
-            System.out.println("In server exception handler");
-            e.printStackTrace();
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
-        });
-
-
     }
 
     public int run(int desiredPort) {

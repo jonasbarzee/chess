@@ -28,10 +28,6 @@ public class GameDataAccess {
         return gameTable.values();
     }
 
-    public void deleteGameData(int gameID) {
-        gameTable.remove(gameID);
-    }
-
     public void deleteAllGameData() {
         gameTable.clear();
     }

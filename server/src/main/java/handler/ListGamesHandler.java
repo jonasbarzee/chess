@@ -20,8 +20,6 @@ public class ListGamesHandler implements Handler {
     public void handle(Context context) throws Exception {
         try {
             String authToken = context.header("authorization");
-            System.out.println("Raw request body: " + context.body());
-            System.out.println(authToken);
             ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
             ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
             context.json(listGamesResult);

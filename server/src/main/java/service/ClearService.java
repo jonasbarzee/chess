@@ -18,7 +18,6 @@ public class ClearService {
     }
 
     public ClearDatabaseResult clearDatabase() {
-        System.out.println("In the clear database method");
         userDataAccess.deleteAllUsers();
         gameDataAccess.deleteAllGameData();
         authDataAccess.deleteAllAuthData();

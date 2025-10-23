@@ -23,8 +23,6 @@ public class LogoutHandler implements Handler {
     public void handle(Context context) throws Exception {
 
         try {
-            System.out.println("In logout handler handle method");
-            System.out.println("Raw request body: " + context.body());
             String authToken = context.header("authorization");
             LogoutRequest logoutRequest = new LogoutRequest(authToken);
             LogoutResult logoutResult = userService.logout(logoutRequest);

@@ -21,15 +21,8 @@ public class JoinGameHandler implements Handler {
     public void handle(Context context) throws Exception{
 
         try {
-            System.out.println("Raw request body: " + context.body());
             String authToken = context.header("authorization");
-            System.out.println(authToken);
-
             JoinGameRequestBody joinGameRequestBody = context.bodyAsClass(JoinGameRequestBody.class);
-            System.out.println(joinGameRequestBody.gameID());
-            System.out.println(joinGameRequestBody.playerColor());
-
-
             JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, joinGameRequestBody.playerColor(), joinGameRequestBody.gameID());
             JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
             context.json(joinGameResult);

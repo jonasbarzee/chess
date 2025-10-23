@@ -21,7 +21,6 @@ public class ClearHandler implements Handler {
     @Override
     public void handle(Context context) throws Exception {
         try {
-            System.out.println("Raw request body: " + context.body());
             clearService.clearDatabase();
             context.json(Map.of());
             context.status(200);

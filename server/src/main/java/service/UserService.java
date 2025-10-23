@@ -42,14 +42,11 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest loginRequest) throws NoUserException, WrongPasswordException, BadRequestException {
-        System.out.println("in the login method!!");
         String username = loginRequest.username();
 
         if (username == null) {
-            System.out.println("username is null");
             throw new BadRequestException("username is null");
         } else if (!userDataAccess.userExists(username)) {
-            System.out.println("username doesn't exist");
             throw new NoUserException("Given username is not registered.");
         }
         UserData userData = userDataAccess.getUser(username);
@@ -57,7 +54,6 @@ public class UserService {
         if (loginRequest.password() == null) {
             throw new BadRequestException("password is null");
         } else if (!loginRequest.password().equals(userData.password())) {
-            System.out.println("password is bad");
             throw new WrongPasswordException("Given password was incorrect.");
         }
 
@@ -68,18 +64,13 @@ public class UserService {
 
     public LogoutResult logout(LogoutRequest logoutRequest) throws UnauthorizedException {
         String authToken = logoutRequest.authToken();
-        System.out.println("authToken:" + authToken);
 
         if (authToken == null) {
-            System.out.println("authToken is null");
             throw new UnauthorizedException("authToken is null");
         } else if (!authDataAccess.isAuthorized(authToken)) {
-            System.out.println("authToken is bad");
             throw new UnauthorizedException("authToken is bad");
         }
-
         if (authDataAccess.isAuthorized(authToken)) {
-            System.out.println("authToken is good");
             authDataAccess.delete(authToken);
         }
         return new LogoutResult();

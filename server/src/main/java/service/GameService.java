@@ -121,7 +121,11 @@ public class GameService {
             Collection<GameData> gamesData = gameDataAccess.getGames();
             Collection<ListGamesResultBuilder> listForResult = new ArrayList<>();
             for (GameData gameData : gamesData) {
-                ListGamesResultBuilder listGamesResultBuilder = new ListGamesResultBuilder(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName());
+                Integer gameID = gameData.gameID();
+                String whiteUsername = gameData.whiteUsername();
+                String blackUsername = gameData.blackUsername();
+                String gameName = gameData.gameName();
+                ListGamesResultBuilder listGamesResultBuilder = new ListGamesResultBuilder(gameID, whiteUsername, blackUsername, gameName);
                 listForResult.add(listGamesResultBuilder);
             }
             return new ListGamesResult(listForResult);

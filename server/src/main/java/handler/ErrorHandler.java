@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class ErrorHandler {
     public void handleError(Context context, Exception e) {
-        System.out.println("In handleError!!");
         if (e instanceof BadRequestException) {
             context.status(400).json(Map.of("message", "Error: Unauthorized"));
         } else if (e instanceof NoUserException) {
