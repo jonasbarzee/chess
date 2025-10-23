@@ -5,6 +5,7 @@ import dataaccess.GameDataAccess;
 import dataaccess.UserDataAccess;
 import handler.*;
 import io.javalin.*;
+import io.javalin.json.JavalinGson;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -17,7 +18,10 @@ public class Server {
 
     public Server() {
         System.out.println("In the server method of the server class!!");
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+            config.jsonMapper(new JavalinGson());
+        });
 
         javalin.before(ctx -> {
             System.out.println("Incoming " + ctx.method() + " " + ctx.path());
@@ -54,7 +58,6 @@ public class Server {
         javalin.get("/game", new ListGamesHandler(gameService, errorHandler));
         javalin.post("/game", new CreateGameHandler(gameService, errorHandler));
         javalin.put("/game", new JoinGameHandler(gameService, errorHandler));
-
 
 
         javalin.exception(Exception.class, (e, ctx) -> {
