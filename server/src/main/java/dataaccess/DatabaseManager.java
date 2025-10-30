@@ -29,6 +29,17 @@ public class DatabaseManager {
         }
     }
 
+    static public void clearDatabase() throws SQLException {
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute("TRUNCATE TABLE auth_data;");
+            stmt.execute("TRUNCATE TABLE users;");
+            stmt.execute("TRUNCATE TABLE games;");
+        } catch (DataAccessException e) {
+            throw new SQLException(String.format("Unable to truncate database, %s", e.getMessage()));
+        }
+    }
+
     /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should
