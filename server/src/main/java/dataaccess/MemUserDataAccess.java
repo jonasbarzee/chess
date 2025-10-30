@@ -5,7 +5,7 @@ import model.UserData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserDataAccess {
+public class MemUserDataAccess {
     private final Map<String, UserData> userTable = new HashMap<>();
 
     public void createUser(UserData userData) throws DataAccessException {

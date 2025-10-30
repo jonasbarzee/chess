@@ -1,26 +1,25 @@
 package service;
 
-import chess.request.ClearDatabaseRequest;
 import chess.result.ClearDatabaseResult;
-import dataaccess.AuthDataAccess;
-import dataaccess.GameDataAccess;
-import dataaccess.UserDataAccess;
+import dataaccess.MemAuthDataAccess;
+import dataaccess.MemGameDataAccess;
+import dataaccess.MemUserDataAccess;
 
 public class ClearService {
-    private final UserDataAccess userDataAccess;
-    private final GameDataAccess gameDataAccess;
-    private final AuthDataAccess authDataAccess;
+    private final MemUserDataAccess memUserDataAccess;
+    private final MemGameDataAccess memGameDataAccess;
+    private final MemAuthDataAccess memAuthDataAccess;
 
-    public ClearService(UserDataAccess userDataAccess, GameDataAccess gameDataAccess, AuthDataAccess authDataAccess) {
-        this.userDataAccess = userDataAccess;
-        this.gameDataAccess = gameDataAccess;
-        this.authDataAccess = authDataAccess;
+    public ClearService(MemUserDataAccess memUserDataAccess, MemGameDataAccess memGameDataAccess, MemAuthDataAccess memAuthDataAccess) {
+        this.memUserDataAccess = memUserDataAccess;
+        this.memGameDataAccess = memGameDataAccess;
+        this.memAuthDataAccess = memAuthDataAccess;
     }
 
     public ClearDatabaseResult clearDatabase() {
-        userDataAccess.deleteAllUsers();
-        gameDataAccess.deleteAllGameData();
-        authDataAccess.deleteAllAuthData();
+        memUserDataAccess.deleteAllUsers();
+        memGameDataAccess.deleteAllGameData();
+        memAuthDataAccess.deleteAllAuthData();
         return new ClearDatabaseResult();
     }
 }

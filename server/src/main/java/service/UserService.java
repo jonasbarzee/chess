@@ -11,12 +11,12 @@ import model.AuthData;
 import model.UserData;
 
 public class UserService {
-    private final UserDataAccess userDataAccess;
-    private final AuthDataAccess authDataAccess;
+    private final MemUserDataAccess memUserDataAccess;
+    private final MemAuthDataAccess memAuthDataAccess;
 
-    public UserService(UserDataAccess userDataAccess, AuthDataAccess authDataAccess) {
-        this.userDataAccess = userDataAccess;
-        this.authDataAccess = authDataAccess;
+    public UserService(MemUserDataAccess memUserDataAccess, MemAuthDataAccess memAuthDataAccess) {
+        this.memUserDataAccess = memUserDataAccess;
+        this.memAuthDataAccess = memAuthDataAccess;
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException {
@@ -32,8 +32,8 @@ public class UserService {
         UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
 
         try {
-            userDataAccess.createUser(userData);
-            AuthData authData = authDataAccess.create(userData.username());
+            memUserDataAccess.createUser(userData);
+            AuthData authData = memAuthDataAccess.create(userData.username());
             return new RegisterResult(authData.username(), authData.authToken());
 
         } catch (DataAccessException ex) {
@@ -46,10 +46,10 @@ public class UserService {
 
         if (username == null) {
             throw new BadRequestException("username is null");
-        } else if (!userDataAccess.userExists(username)) {
+        } else if (!memUserDataAccess.userExists(username)) {
             throw new NoUserException("Given username is not registered.");
         }
-        UserData userData = userDataAccess.getUser(username);
+        UserData userData = memUserDataAccess.getUser(username);
 
         if (loginRequest.password() == null) {
             throw new BadRequestException("password is null");
@@ -57,7 +57,7 @@ public class UserService {
             throw new WrongPasswordException("Given password was incorrect.");
         }
 
-        AuthData authData = authDataAccess.update(username);
+        AuthData authData = memAuthDataAccess.update(username);
         return new LoginResult(authData.authToken(), authData.username());
 
     }
@@ -67,11 +67,11 @@ public class UserService {
 
         if (authToken == null) {
             throw new UnauthorizedException("authToken is null");
-        } else if (!authDataAccess.isAuthorized(authToken)) {
+        } else if (!memAuthDataAccess.isAuthorized(authToken)) {
             throw new UnauthorizedException("authToken is bad");
         }
-        if (authDataAccess.isAuthorized(authToken)) {
-            authDataAccess.delete(authToken);
+        if (memAuthDataAccess.isAuthorized(authToken)) {
+            memAuthDataAccess.delete(authToken);
         }
         return new LogoutResult();
     }

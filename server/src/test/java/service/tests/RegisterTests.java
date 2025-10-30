@@ -2,8 +2,8 @@ package service.tests;
 
 import chess.request.RegisterRequest;
 import chess.result.RegisterResult;
-import dataaccess.AuthDataAccess;
-import dataaccess.UserDataAccess;
+import dataaccess.MemAuthDataAccess;
+import dataaccess.MemUserDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -14,14 +14,14 @@ import service.UserService;
 public class RegisterTests {
 
     private UserService userService;
-    private UserDataAccess userDataAccess;
-    private AuthDataAccess authDataAccess;
+    private MemUserDataAccess memUserDataAccess;
+    private MemAuthDataAccess memAuthDataAccess;
 
     @Test
     public void registerSuccess() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -37,9 +37,9 @@ public class RegisterTests {
 
     @Test
     public void registerFailureUserExists() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
         AuthData authData = new AuthData("authToken", userData.username());

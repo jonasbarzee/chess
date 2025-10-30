@@ -1,16 +1,14 @@
 package server;
 
-import dataaccess.AuthDataAccess;
-import dataaccess.GameDataAccess;
-import dataaccess.UserDataAccess;
+import dataaccess.MemAuthDataAccess;
+import dataaccess.MemGameDataAccess;
+import dataaccess.MemUserDataAccess;
 import handler.*;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
-
-import java.util.Map;
 
 public class Server {
 
@@ -23,12 +21,12 @@ public class Server {
         });
 
         // Register your endpoints and exception handlers here.
-        UserDataAccess userDataAccess = new UserDataAccess();
-        AuthDataAccess authDataAccess = new AuthDataAccess();
-        GameDataAccess gameDataAccess = new GameDataAccess();
-        UserService userService = new UserService(userDataAccess, authDataAccess);
-        GameService gameService = new GameService(gameDataAccess, authDataAccess, userDataAccess);
-        ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
+        MemUserDataAccess memUserDataAccess = new MemUserDataAccess();
+        MemAuthDataAccess memAuthDataAccess = new MemAuthDataAccess();
+        MemGameDataAccess memGameDataAccess = new MemGameDataAccess();
+        UserService userService = new UserService(memUserDataAccess, memAuthDataAccess);
+        GameService gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        ClearService clearService = new ClearService(memUserDataAccess, memGameDataAccess, memAuthDataAccess);
         ErrorHandler errorHandler = new ErrorHandler();
 
         javalin.post("/user", new RegisterHandler(userService, errorHandler));

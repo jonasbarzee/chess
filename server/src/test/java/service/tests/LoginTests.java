@@ -6,8 +6,8 @@ import chess.request.RegisterRequest;
 import chess.result.LoginResult;
 import chess.result.LogoutResult;
 import chess.result.RegisterResult;
-import dataaccess.AuthDataAccess;
-import dataaccess.UserDataAccess;
+import dataaccess.MemAuthDataAccess;
+import dataaccess.MemUserDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,14 +19,14 @@ import service.UserService;
 public class LoginTests {
 
     private UserService userService;
-    private UserDataAccess userDataAccess;
-    private AuthDataAccess authDataAccess;
+    private MemUserDataAccess memUserDataAccess;
+    private MemAuthDataAccess memAuthDataAccess;
 
     @Test
     public void loginSuccess() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -51,9 +51,9 @@ public class LoginTests {
 
     @Test
     public void loginFailureWrongUsername() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -75,9 +75,9 @@ public class LoginTests {
 
     @Test
     public void loginFailureWrongPassword() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -99,9 +99,9 @@ public class LoginTests {
 
     @Test
     public void logoutSuccess() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -132,9 +132,9 @@ public class LoginTests {
 
     @Test
     public void logoutFailureBadToken() {
-        userDataAccess = new UserDataAccess();
-        authDataAccess = new AuthDataAccess();
-        userService = new UserService(userDataAccess, authDataAccess);
+        memUserDataAccess = new MemUserDataAccess();
+        memAuthDataAccess = new MemAuthDataAccess();
+        userService = new UserService(memUserDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 

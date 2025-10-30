@@ -4,7 +4,7 @@ import model.AuthData;
 
 import java.util.*;
 
-public class AuthDataAccess {
+public class MemAuthDataAccess {
     private final Map<String, AuthData> authTable = new HashMap<>();
 
     public AuthData create(String username) throws AuthDataAccessException {

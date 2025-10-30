@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameDataAccess {
+public class MemGameDataAccess {
     private final Map<Integer, GameData> gameTable = new HashMap<>();
 
     public void createGameData(GameData gameData) {
