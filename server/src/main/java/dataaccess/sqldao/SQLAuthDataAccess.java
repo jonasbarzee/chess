@@ -11,19 +11,19 @@ import java.util.UUID;
 
 public class SQLAuthDataAccess extends SQLDataAccess {
 
-    public SQLAuthDataAccess() throws AuthDataAccessException {
+    public SQLAuthDataAccess()  {
     }
 
-    public AuthData create(String username) throws AuthDataAccessException {
-        String authToken = generateToken();
+    public void create(AuthData authData) throws AuthDataAccessException {
+        String user = authData.username();
+        String token = authData.authToken();
 
         String statement = "INSERT INTO auth_data (auth_token, username) VALUES (?, ?)";
         try {
-            executeUpdate(statement, authToken, username);
+            executeUpdate(statement,token ,user);
         } catch (SQLDataAccessException e) {
             throw new AuthDataAccessException(String.format("Unable to insert into auth_data, %s", e.getMessage()));
         }
-        return new AuthData(authToken, username);
     }
 
     public AuthData get(String authToken) throws AuthDataAccessException {
@@ -40,13 +40,11 @@ public class SQLAuthDataAccess extends SQLDataAccess {
         try {
             return executeUpdate(statement, authToken);
         } catch (SQLDataAccessException e) {
-            throw new AuthDataAccessException(String.format("Unable to insert into auth_data, %s", e.getMessage()));
+            throw new AuthDataAccessException(String.format("Unable to delete from auth_data, %s", e.getMessage()));
         }
 
     }
 
 
-    private static String generateToken() {
-        return UUID.randomUUID().toString();
-    }
+
 }

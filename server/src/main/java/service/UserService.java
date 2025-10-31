@@ -11,6 +11,9 @@ import dataaccess.memdao.MemAuthDataAccess;
 import dataaccess.memdao.MemUserDataAccess;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
+
+import java.util.UUID;
 
 public class UserService {
     private final MemUserDataAccess memUserDataAccess;
@@ -76,5 +79,13 @@ public class UserService {
             memAuthDataAccess.delete(authToken);
         }
         return new LogoutResult();
+    }
+
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    private static String encryptPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }
