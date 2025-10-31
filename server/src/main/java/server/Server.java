@@ -1,8 +1,8 @@
 package server;
 
-import dataaccess.MemAuthDataAccess;
-import dataaccess.MemGameDataAccess;
-import dataaccess.MemUserDataAccess;
+import dataaccess.memdao.MemAuthDataAccess;
+import dataaccess.memdao.MemGameDataAccess;
+import dataaccess.memdao.MemUserDataAccess;
 import handler.*;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;

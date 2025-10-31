@@ -1,6 +1,4 @@
- import dataaccess.AuthDataAccessException;
- import dataaccess.SQLAuthDataAccess;
- import server.Server;
+import server.Server;
 
 public class Main {
     public static void main(String[] args) {

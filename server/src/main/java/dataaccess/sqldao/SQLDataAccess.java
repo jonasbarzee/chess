@@ -1,6 +1,9 @@
-package dataaccess;
+package dataaccess.sqldao;
 
 import chess.ChessGame;
+import dataaccess.exceptions.AuthDataAccessException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.SQLDataAccessException;
 
 import java.sql.*;
 
@@ -8,7 +11,7 @@ import static java.sql.Types.NULL;
 
 public abstract class SQLDataAccess {
 
-    private final String[] createStatements = {
+    private static final String[] createStatements = {
 
             "USE chess;",
 
@@ -38,7 +41,7 @@ public abstract class SQLDataAccess {
             """
     };
 
-    protected void configureDatabase() throws SQLDataAccessException {
+    static public void configureDatabase() throws SQLDataAccessException {
         try {
             DatabaseManager.createDatabase();
             Connection connection = DatabaseManager.getConnection();
@@ -71,14 +74,14 @@ public abstract class SQLDataAccess {
                         ps.setNull(i + 1, NULL);
                     }
                 }
-                ps.executeUpdate();
+                int affectedRows = ps.executeUpdate();
 
                 ResultSet resultSet = ps.getGeneratedKeys();
                 if (resultSet.next()) {
                     return resultSet.getInt(1);
                 }
 
-                return 0;
+                return affectedRows;
             }
         } catch (Exception ex) {
             throw new SQLDataAccessException(String.format("couldn't update database: %s, %s", statement, ex.getMessage()));

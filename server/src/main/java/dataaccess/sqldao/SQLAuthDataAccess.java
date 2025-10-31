@@ -1,6 +1,8 @@
-package dataaccess;
+package dataaccess.sqldao;
 
 
+import dataaccess.exceptions.AuthDataAccessException;
+import dataaccess.exceptions.SQLDataAccessException;
 import model.AuthData;
 
 import java.sql.SQLException;
@@ -10,11 +12,6 @@ import java.util.UUID;
 public class SQLAuthDataAccess extends SQLDataAccess {
 
     public SQLAuthDataAccess() throws AuthDataAccessException {
-        try {
-            configureDatabase();
-        } catch (SQLDataAccessException ex) {
-            throw new AuthDataAccessException(String.format("Couldn't configure the database, %s", ex.getMessage()));
-        }
     }
 
     public AuthData create(String username) throws AuthDataAccessException {
@@ -30,13 +27,24 @@ public class SQLAuthDataAccess extends SQLDataAccess {
     }
 
     public AuthData get(String authToken) throws AuthDataAccessException {
-        String statement = ("SELECT * FROM auth_data WHERE auth_token = ?;");
+        String statement = "SELECT * FROM auth_data WHERE auth_token = ?;";
         try {
             return queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
         } catch (SQLException e) {
             throw new AuthDataAccessException("Unable to read from auth_data");
         }
     }
+
+    public int delete(String authToken) throws AuthDataAccessException {
+        String statement = "DELETE FROM auth_data WHERE auth_token = ?;";
+        try {
+            return executeUpdate(statement, authToken);
+        } catch (SQLDataAccessException e) {
+            throw new AuthDataAccessException(String.format("Unable to insert into auth_data, %s", e.getMessage()));
+        }
+
+    }
+
 
     private static String generateToken() {
         return UUID.randomUUID().toString();

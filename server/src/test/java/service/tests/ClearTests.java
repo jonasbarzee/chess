@@ -1,7 +1,12 @@
 package service.tests;
 
 import chess.ChessGame;
-import dataaccess.*;
+import dataaccess.exceptions.AuthDataAccessException;
+import dataaccess.exceptions.GameDataAccessException;
+import dataaccess.exceptions.UserDataAccessException;
+import dataaccess.memdao.MemAuthDataAccess;
+import dataaccess.memdao.MemGameDataAccess;
+import dataaccess.memdao.MemUserDataAccess;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;

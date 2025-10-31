@@ -1,9 +1,9 @@
 package service;
 
 import chess.result.ClearDatabaseResult;
-import dataaccess.MemAuthDataAccess;
-import dataaccess.MemGameDataAccess;
-import dataaccess.MemUserDataAccess;
+import dataaccess.memdao.MemAuthDataAccess;
+import dataaccess.memdao.MemGameDataAccess;
+import dataaccess.memdao.MemUserDataAccess;
 
 public class ClearService {
     private final MemUserDataAccess memUserDataAccess;

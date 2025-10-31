@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.memdao;
 
+import dataaccess.exceptions.AuthDataAccessException;
 import model.AuthData;
 
 import java.util.*;

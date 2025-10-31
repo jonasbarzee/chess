@@ -6,7 +6,9 @@ import chess.request.RegisterRequest;
 import chess.result.LoginResult;
 import chess.result.LogoutResult;
 import chess.result.RegisterResult;
-import dataaccess.*;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.memdao.MemAuthDataAccess;
+import dataaccess.memdao.MemUserDataAccess;
 import model.AuthData;
 import model.UserData;
 

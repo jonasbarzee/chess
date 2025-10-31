@@ -2,8 +2,8 @@ package service.tests;
 
 import chess.request.RegisterRequest;
 import chess.result.RegisterResult;
-import dataaccess.MemAuthDataAccess;
-import dataaccess.MemUserDataAccess;
+import dataaccess.memdao.MemAuthDataAccess;
+import dataaccess.memdao.MemUserDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
