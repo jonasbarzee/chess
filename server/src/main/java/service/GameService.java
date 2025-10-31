@@ -12,7 +12,6 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.GameDataAccessException;
 import dataaccess.memdao.MemAuthDataAccess;
 import dataaccess.memdao.MemGameDataAccess;
-import dataaccess.memdao.MemUserDataAccess;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class GameService {
     private final MemAuthDataAccess memAuthDataAccess;
     private Integer gameID = 0;
 
-    public GameService(MemGameDataAccess memGameDataAccess, MemAuthDataAccess memAuthDataAccess, MemUserDataAccess memUserDataAccess) {
+    public GameService(MemGameDataAccess memGameDataAccess, MemAuthDataAccess memAuthDataAccess) {
         this.memGameDataAccess = memGameDataAccess;
         this.memAuthDataAccess = memAuthDataAccess;
     }

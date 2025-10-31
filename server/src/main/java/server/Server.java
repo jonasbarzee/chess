@@ -25,7 +25,7 @@ public class Server {
         MemAuthDataAccess memAuthDataAccess = new MemAuthDataAccess();
         MemGameDataAccess memGameDataAccess = new MemGameDataAccess();
         UserService userService = new UserService(memUserDataAccess, memAuthDataAccess);
-        GameService gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        GameService gameService = new GameService(memGameDataAccess, memAuthDataAccess);
         ClearService clearService = new ClearService(memUserDataAccess, memGameDataAccess, memAuthDataAccess);
         ErrorHandler errorHandler = new ErrorHandler();
 

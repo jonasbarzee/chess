@@ -28,7 +28,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -46,7 +46,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -61,7 +61,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -80,7 +80,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
 
@@ -99,7 +99,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
         UserData userData1 = new UserData("username1", "password1", "email1@email.com");
@@ -127,7 +127,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
         UserData userData = new UserData("username", "password", "email@email.com");
         UserData userData1 = new UserData("username1", "password1", "email1@email.com");
@@ -158,7 +158,7 @@ public class GameTests {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess, memUserDataAccess);
+        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
 
 
         UserData userData = new UserData("username", "password", "email@email.com");

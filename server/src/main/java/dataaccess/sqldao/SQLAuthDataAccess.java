@@ -6,7 +6,6 @@ import dataaccess.exceptions.SQLDataAccessException;
 import model.AuthData;
 
 import java.sql.SQLException;
-import java.util.UUID;
 
 
 public class SQLAuthDataAccess extends SQLDataAccess {

@@ -11,8 +11,8 @@ import static java.sql.Types.NULL;
 
 public abstract class SQLDataAccess {
 
-    private static final String[] createStatements = {
 
+    private static final String[] createStatements = {
             "USE chess;",
 
             """
@@ -31,14 +31,16 @@ public abstract class SQLDataAccess {
             );
             """,
             """ 
-            CREATE TABLE IF NOT EXISTS games (
+           CREATE TABLE IF NOT EXISTS games (
                 game_id INT NOT NULL AUTO_INCREMENT,
                 chess_game LONGTEXT NOT NULL,
+                game_name VARCHAR(50) NOT NULL,
+                white_username VARCHAR(50) NOT NULL,
+                black_username VARCHAR(50) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (game_id)
-            );
-            """
+            );"""
     };
 
     static public void configureDatabase() throws SQLDataAccessException {
