@@ -1,5 +1,6 @@
 package dataaccess.memdao;
 
+import dataaccess.GameDataAccess;
 import dataaccess.exceptions.GameDataAccessException;
 import model.GameData;
 
@@ -7,7 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MemGameDataAccess {
+public class MemGameDataAccess implements GameDataAccess {
     private final Map<Integer, GameData> gameTable = new HashMap<>();
 
     public void createGameData(GameData gameData) {

@@ -1,11 +1,12 @@
 package dataaccess.memdao;
 
+import dataaccess.AuthDataAccess;
 import dataaccess.exceptions.AuthDataAccessException;
 import model.AuthData;
 
 import java.util.*;
 
-public class MemAuthDataAccess {
+public class MemAuthDataAccess implements AuthDataAccess {
     private final Map<String, AuthData> authTable = new HashMap<>();
 
     public AuthData create(String username) throws AuthDataAccessException {
