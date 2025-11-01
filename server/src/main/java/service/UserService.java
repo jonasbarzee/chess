@@ -6,9 +6,12 @@ import chess.request.RegisterRequest;
 import chess.result.LoginResult;
 import chess.result.LogoutResult;
 import chess.result.RegisterResult;
+import dataaccess.AuthDataAccess;
+import dataaccess.UserDataAccess;
+import dataaccess.exceptions.AuthDataAccessException;
 import dataaccess.exceptions.DataAccessException;
-import dataaccess.memdao.MemAuthDataAccess;
-import dataaccess.memdao.MemUserDataAccess;
+import dataaccess.exceptions.SQLDataAccessException;
+import dataaccess.exceptions.UserDataAccessException;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
@@ -16,15 +19,15 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.UUID;
 
 public class UserService {
-    private final MemUserDataAccess memUserDataAccess;
-    private final MemAuthDataAccess memAuthDataAccess;
+    private final UserDataAccess userDataAccess;
+    private final AuthDataAccess authDataAccess;
 
-    public UserService(MemUserDataAccess memUserDataAccess, MemAuthDataAccess memAuthDataAccess) {
-        this.memUserDataAccess = memUserDataAccess;
-        this.memAuthDataAccess = memAuthDataAccess;
+    public UserService(UserDataAccess memUserDataAccess, AuthDataAccess authDataAccess) {
+        this.userDataAccess = memUserDataAccess;
+        this.authDataAccess = authDataAccess;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException {
+    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException, SQLDataAccessException {
 
         String username = registerRequest.username();
         String password = registerRequest.password();
@@ -34,13 +37,14 @@ public class UserService {
             throw new BadRequestException("Bad request");
         }
 
-        UserData userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        String encryptedPassword = encryptPassword(password);
+
+        UserData userData = new UserData(username, encryptedPassword, email);
 
         try {
-            memUserDataAccess.createUser(userData);
-            AuthData authData = memAuthDataAccess.create(userData.username());
+            userDataAccess.createUser(userData);
+            AuthData authData = authDataAccess.create(userData.username());
             return new RegisterResult(authData.username(), authData.authToken());
-
         } catch (DataAccessException ex) {
             throw new AlreadyTakenException("Username is already taken.");
         }
@@ -48,21 +52,35 @@ public class UserService {
 
     public LoginResult login(LoginRequest loginRequest) throws NoUserException, WrongPasswordException, BadRequestException {
         String username = loginRequest.username();
+        String password = loginRequest.password();
 
         if (username == null) {
             throw new BadRequestException("username is null");
-        } else if (!memUserDataAccess.userExists(username)) {
+        } else if (!userDataAccess.userExists(username)) {
             throw new NoUserException("Given username is not registered.");
         }
-        UserData userData = memUserDataAccess.getUser(username);
+        UserData userData = userDataAccess.getUser(username);
+        System.out.println(password);
+        String encrypted = userData.password();
+        System.out.println(encrypted);
+        System.out.println(checkPassword(encrypted, password));
+
+        System.out.println("clearPassword: " + password);
+        System.out.println("storedHash: " + encrypted);
+
+        if (encrypted == null) {
+            System.out.println("storedHash is null!");
+        } else if (!encrypted.startsWith("$2")) {
+            System.out.println("storedHash looks invalid!");
+        }
 
         if (loginRequest.password() == null) {
             throw new BadRequestException("password is null");
-        } else if (!loginRequest.password().equals(userData.password())) {
+        } else if (!checkPassword(encrypted, password)) {
             throw new WrongPasswordException("Given password was incorrect.");
         }
 
-        AuthData authData = memAuthDataAccess.update(username);
+        AuthData authData = authDataAccess.update(username);
         return new LoginResult(authData.authToken(), authData.username());
 
     }
@@ -70,13 +88,17 @@ public class UserService {
     public LogoutResult logout(LogoutRequest logoutRequest) throws UnauthorizedException {
         String authToken = logoutRequest.authToken();
 
+        if (!authDataAccess.isAuthorized(authToken)) {
+            throw new UnauthorizedException("user is not authorized");
+        }
+
         if (authToken == null) {
             throw new UnauthorizedException("authToken is null");
-        } else if (!memAuthDataAccess.isAuthorized(authToken)) {
+        } else if (!authDataAccess.isAuthorized(authToken)) {
             throw new UnauthorizedException("authToken is bad");
         }
-        if (memAuthDataAccess.isAuthorized(authToken)) {
-            memAuthDataAccess.delete(authToken);
+        if (authDataAccess.isAuthorized(authToken)) {
+            authDataAccess.delete(authToken);
         }
         return new LogoutResult();
     }
@@ -87,5 +109,9 @@ public class UserService {
 
     private static String encryptPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    private static boolean checkPassword(String encryptedPass, String clearPass) {
+        return BCrypt.checkpw(clearPass, encryptedPass);
     }
 }

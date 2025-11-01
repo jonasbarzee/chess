@@ -8,6 +8,8 @@ import chess.result.CreateGameResult;
 import chess.result.JoinGameResult;
 import chess.result.ListGamesResult;
 import chess.result.ListGamesResultBuilder;
+import dataaccess.AuthDataAccess;
+import dataaccess.GameDataAccess;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.GameDataAccessException;
 import dataaccess.memdao.MemAuthDataAccess;
@@ -19,13 +21,14 @@ import java.util.Collection;
 
 public class GameService {
 
-    private final MemGameDataAccess memGameDataAccess;
-    private final MemAuthDataAccess memAuthDataAccess;
-    private Integer gameID = 0;
+    private final GameDataAccess gameDataAccess;
+    private final AuthDataAccess authDataAccess;
+    private Integer gameID;
 
-    public GameService(MemGameDataAccess memGameDataAccess, MemAuthDataAccess memAuthDataAccess) {
-        this.memGameDataAccess = memGameDataAccess;
-        this.memAuthDataAccess = memAuthDataAccess;
+    public GameService(GameDataAccess gameDataAccess, AuthDataAccess authDataAccess) {
+        this.gameDataAccess = gameDataAccess;
+        this.authDataAccess = authDataAccess;
+        gameID = 0;
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException {
@@ -34,11 +37,12 @@ public class GameService {
             throw new BadRequestException("gameName is null");
         }
 
-        if (memAuthDataAccess.isAuthorized(createGameRequest.authToken())) {
+        if (authDataAccess.isAuthorized(createGameRequest.authToken())) {
+            // game id is a placeholder right now, the real game id comes back from the database and is returned in the create game result
             gameID += 1;
             GameData gameData = new GameData(gameID, null, null, createGameRequest.gameName(), new ChessGame());
-            memGameDataAccess.createGameData(gameData);
-            return new CreateGameResult(gameData.gameID());
+            Integer gameIDToReturn = gameDataAccess.createGameData(gameData);
+            return new CreateGameResult(gameIDToReturn);
         }
         throw new UnauthorizedException("Unauthorized");
     }
@@ -46,7 +50,7 @@ public class GameService {
 
     private boolean canJoinAsColor(String color, Integer gameID) throws BadRequestException {
         try {
-            GameData gameData = memGameDataAccess.getGame(gameID);
+            GameData gameData = gameDataAccess.getGame(gameID);
 
             switch (color.toLowerCase()) {
                 case ("white"): {
@@ -84,15 +88,15 @@ public class GameService {
 
         String username;
         try {
-            username = memAuthDataAccess.getUsername(authToken);
+            username = authDataAccess.getUsername(authToken);
         } catch (DataAccessException ex) {
             throw new UnauthorizedException("Bad Request.");
         }
 
-        if (memAuthDataAccess.isAuthorized(authToken)) {
+        if (authDataAccess.isAuthorized(authToken)) {
             GameData gameData;
             try {
-                gameData = memGameDataAccess.getGame(gameID);
+                gameData = gameDataAccess.getGame(gameID);
             } catch (GameDataAccessException ex) {
                 throw new GameDataAccessException("No game with the given gameID.");
             }
@@ -101,11 +105,11 @@ public class GameService {
                 switch (playerColor) {
                     case ("white"):
                         GameData gameDataToUpdateWhite = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
-                        memGameDataAccess.updateGameData(gameDataToUpdateWhite);
+                        gameDataAccess.updateGameData(gameDataToUpdateWhite);
                         break;
                     case ("black"):
                         GameData gameDataToUpdateBlack = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
-                        memGameDataAccess.updateGameData(gameDataToUpdateBlack);
+                        gameDataAccess.updateGameData(gameDataToUpdateBlack);
                         break;
                     default:
                         throw new BadRequestException("Bad Request.");
@@ -120,8 +124,8 @@ public class GameService {
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException {
         String authToken = listGamesRequest.authToken();
 
-        if (memAuthDataAccess.isAuthorized(authToken)) {
-            Collection<GameData> gamesData = memGameDataAccess.getGames();
+        if (authDataAccess.isAuthorized(authToken)) {
+            Collection<GameData> gamesData = gameDataAccess.getGames();
             Collection<ListGamesResultBuilder> listForResult = new ArrayList<>();
             for (GameData gameData : gamesData) {
                 Integer gameID = gameData.gameID();

@@ -29,6 +29,7 @@ public class LogoutHandler implements Handler {
             context.json(logoutResult);
             context.status(200);
 
+
         } catch (Exception ex) {
             errorHandler.handleError(context, ex);
         }

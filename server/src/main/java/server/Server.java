@@ -1,8 +1,9 @@
 package server;
 
-import dataaccess.memdao.MemAuthDataAccess;
 import dataaccess.memdao.MemGameDataAccess;
-import dataaccess.memdao.MemUserDataAccess;
+import dataaccess.sqldao.SQLAuthDataAccess;
+import dataaccess.sqldao.SQLGameDataAccess;
+import dataaccess.sqldao.SQLUserDataAccess;
 import handler.*;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
@@ -21,12 +22,12 @@ public class Server {
         });
 
         // Register your endpoints and exception handlers here.
-        MemUserDataAccess memUserDataAccess = new MemUserDataAccess();
-        MemAuthDataAccess memAuthDataAccess = new MemAuthDataAccess();
-        MemGameDataAccess memGameDataAccess = new MemGameDataAccess();
-        UserService userService = new UserService(memUserDataAccess, memAuthDataAccess);
-        GameService gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-        ClearService clearService = new ClearService(memUserDataAccess, memGameDataAccess, memAuthDataAccess);
+        SQLUserDataAccess userDataAccess = new SQLUserDataAccess();
+        SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
+        SQLGameDataAccess gameDataAccess = new SQLGameDataAccess();
+        UserService userService = new UserService(userDataAccess, authDataAccess);
+        GameService gameService = new GameService(gameDataAccess, authDataAccess);
+        ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
         ErrorHandler errorHandler = new ErrorHandler();
 
         javalin.post("/user", new RegisterHandler(userService, errorHandler));

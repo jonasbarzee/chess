@@ -1,7 +1,6 @@
 package dataaccess.memdao;
 
 import dataaccess.UserDataAccess;
-import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.UserDataAccessException;
 import model.UserData;
 
@@ -11,7 +10,7 @@ import java.util.Map;
 public class MemUserDataAccess implements UserDataAccess {
     private final Map<String, UserData> userTable = new HashMap<>();
 
-    public void createUser(UserData userData) throws DataAccessException {
+    public void createUser(UserData userData) throws UserDataAccessException {
         if (getUser(userData.username()) != null) {
             throw new UserDataAccessException("User already exists");
         }

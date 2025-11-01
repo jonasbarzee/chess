@@ -9,7 +9,7 @@ public interface AuthDataAccess {
     public boolean isAuthorized(String authToken);
     public String getUsername(String authToken) throws AuthDataAccessException;
     public AuthData create(String username) throws AuthDataAccessException;
-    public AuthData update(String username) throws AuthDataAccessException;
+    public AuthData update(String username);
 
 
 }

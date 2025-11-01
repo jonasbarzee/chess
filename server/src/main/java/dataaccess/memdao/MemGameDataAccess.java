@@ -11,8 +11,9 @@ import java.util.Map;
 public class MemGameDataAccess implements GameDataAccess {
     private final Map<Integer, GameData> gameTable = new HashMap<>();
 
-    public void createGameData(GameData gameData) {
+    public Integer createGameData(GameData gameData) {
         gameTable.put(gameData.gameID(), gameData);
+        return gameData.gameID();
     }
 
     public void updateGameData(GameData gameData) {

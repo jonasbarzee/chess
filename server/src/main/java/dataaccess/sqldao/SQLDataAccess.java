@@ -35,8 +35,8 @@ public abstract class SQLDataAccess {
                 game_id INT NOT NULL AUTO_INCREMENT,
                 chess_game LONGTEXT NOT NULL,
                 game_name VARCHAR(50) NOT NULL,
-                white_username VARCHAR(50) NOT NULL,
-                black_username VARCHAR(50) NOT NULL,
+                white_username VARCHAR(50),
+                black_username VARCHAR(50),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (game_id)
@@ -82,7 +82,7 @@ public abstract class SQLDataAccess {
                 if (resultSet.next()) {
                     return resultSet.getInt(1);
                 }
-
+                // returns affected rows if now auto incrementing id
                 return affectedRows;
             }
         } catch (Exception ex) {

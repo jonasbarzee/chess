@@ -33,9 +33,9 @@ public class UserDataAccessTests {
             UserData userData2 = new UserData("user2", "password", "email2@email.com");
             UserData userData3 = new UserData("user3", "password", "email3@email.com");
 
-            sqlUserDataAccess.create(userData1);
-            sqlUserDataAccess.create(userData2);
-            sqlUserDataAccess.create(userData3);
+            sqlUserDataAccess.createUser(userData1);
+            sqlUserDataAccess.createUser(userData2);
+            sqlUserDataAccess.createUser(userData3);
         });
     }
 
@@ -43,7 +43,7 @@ public class UserDataAccessTests {
     public void createFailureBadInput() {
         Assertions.assertThrows(UserDataAccessException.class, () -> {
             UserData userData = new UserData(null, null, null);
-            sqlUserDataAccess.create(userData);
+            sqlUserDataAccess.createUser(userData);
         });
     }
 
@@ -51,15 +51,15 @@ public class UserDataAccessTests {
     public void getSuccess() {
         Assertions.assertDoesNotThrow(() -> {
             UserData userData = new UserData("user1", "password", "email@email.com");
-            sqlUserDataAccess.create(userData);
-            sqlUserDataAccess.get(userData.username());
+            sqlUserDataAccess.createUser(userData);
+            sqlUserDataAccess.getUser(userData.username());
         });
     }
 
     @Test
     public void getFailureNoUser() {
         Assertions.assertDoesNotThrow(() -> {
-            UserData result = sqlUserDataAccess.get("user1");
+            UserData result = sqlUserDataAccess.getUser("user1");
             Assertions.assertNull(result);
         });
     }
@@ -69,9 +69,9 @@ public class UserDataAccessTests {
         Assertions.assertDoesNotThrow(() -> {
             UserData userData = new UserData("user1", "password", "email@email.com");
             UserData userDataToUpdate = new UserData(userData.username(), "new", "new@email.com");
-            sqlUserDataAccess.create(userData);
+            sqlUserDataAccess.createUser(userData);
             int result = sqlUserDataAccess.update(userDataToUpdate);
-            UserData userDataResult = sqlUserDataAccess.get(userData.username());
+            UserData userDataResult = sqlUserDataAccess.getUser(userData.username());
 
             Assertions.assertNotNull(userDataResult);
             assert userDataResult.username().equals(userDataToUpdate.username());
@@ -85,7 +85,7 @@ public class UserDataAccessTests {
     public void updateFailureBadInput() {
         Assertions.assertThrows(UserDataAccessException.class, () -> {
             UserData userData = new UserData("user1", "password", "email@email.com");
-            sqlUserDataAccess.create(userData);
+            sqlUserDataAccess.createUser(userData);
             UserData userDataToUpdate = new UserData("user1", null, null);
             sqlUserDataAccess.update(userDataToUpdate);
         });
@@ -98,9 +98,9 @@ public class UserDataAccessTests {
             UserData userData2 = new UserData("user2", "password", "email2@email.com");
             UserData userData3 = new UserData("user3", "password", "email3@email.com");
 
-            sqlUserDataAccess.create(userData1);
-            sqlUserDataAccess.create(userData2);
-            sqlUserDataAccess.create(userData3);
+            sqlUserDataAccess.createUser(userData1);
+            sqlUserDataAccess.createUser(userData2);
+            sqlUserDataAccess.createUser(userData3);
 
             int result1 = sqlUserDataAccess.delete(userData1.username());
             int result2 = sqlUserDataAccess.delete(userData2.username());
