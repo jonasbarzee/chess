@@ -1,9 +1,8 @@
 package server;
 
-import dataaccess.memdao.MemGameDataAccess;
-import dataaccess.sqldao.SQLAuthDataAccess;
-import dataaccess.sqldao.SQLGameDataAccess;
-import dataaccess.sqldao.SQLUserDataAccess;
+import dataaccess.SQLAuthDataAccess;
+import dataaccess.SQLGameDataAccess;
+import dataaccess.SQLUserDataAccess;
 import handler.*;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;

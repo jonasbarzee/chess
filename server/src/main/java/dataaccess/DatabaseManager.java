@@ -1,6 +1,4 @@
-package dataaccess.sqldao;
-
-import dataaccess.exceptions.DataAccessException;
+package dataaccess;
 
 import java.sql.*;
 import java.util.Properties;

@@ -4,7 +4,7 @@ import chess.result.ClearDatabaseResult;
 import dataaccess.AuthDataAccess;
 import dataaccess.GameDataAccess;
 import dataaccess.UserDataAccess;
-import dataaccess.exceptions.SQLDataAccessException;
+import dataaccess.SQLDataAccessException;
 
 public class ClearService {
     private final UserDataAccess userDataAccess;

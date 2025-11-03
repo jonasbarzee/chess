@@ -1,9 +1,6 @@
-package dataaccess.sqldao;
+package dataaccess;
 
 import chess.ChessGame;
-import dataaccess.exceptions.AuthDataAccessException;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.SQLDataAccessException;
 
 import java.sql.*;
 

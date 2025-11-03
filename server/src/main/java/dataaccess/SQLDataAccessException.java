@@ -1,4 +1,4 @@
-package dataaccess.exceptions;
+package dataaccess;
 
 public class SQLDataAccessException extends DataAccessException {
     public SQLDataAccessException(String message) {

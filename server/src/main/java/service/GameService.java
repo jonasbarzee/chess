@@ -10,10 +10,8 @@ import chess.result.ListGamesResult;
 import chess.result.ListGamesResultBuilder;
 import dataaccess.AuthDataAccess;
 import dataaccess.GameDataAccess;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.GameDataAccessException;
-import dataaccess.memdao.MemAuthDataAccess;
-import dataaccess.memdao.MemGameDataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.GameDataAccessException;
 import model.GameData;
 
 import java.util.ArrayList;

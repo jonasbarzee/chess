@@ -1,9 +1,9 @@
 package service.tests;
 
-import dataaccess.exceptions.UserDataAccessException;
-import dataaccess.sqldao.DatabaseManager;
-import dataaccess.sqldao.SQLDataAccess;
-import dataaccess.sqldao.SQLUserDataAccess;
+import dataaccess.UserDataAccessException;
+import dataaccess.DatabaseManager;
+import dataaccess.SQLDataAccess;
+import dataaccess.SQLUserDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
 

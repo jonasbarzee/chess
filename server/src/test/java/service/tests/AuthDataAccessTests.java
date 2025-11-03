@@ -1,9 +1,9 @@
 package service.tests;
 
-import dataaccess.exceptions.AuthDataAccessException;
-import dataaccess.sqldao.DatabaseManager;
-import dataaccess.sqldao.SQLAuthDataAccess;
-import dataaccess.sqldao.SQLDataAccess;
+import dataaccess.AuthDataAccessException;
+import dataaccess.DatabaseManager;
+import dataaccess.SQLAuthDataAccess;
+import dataaccess.SQLDataAccess;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 

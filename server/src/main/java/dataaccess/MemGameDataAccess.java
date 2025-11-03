@@ -1,7 +1,5 @@
-package dataaccess.memdao;
+package dataaccess;
 
-import dataaccess.GameDataAccess;
-import dataaccess.exceptions.GameDataAccessException;
 import model.GameData;
 
 import java.util.Collection;

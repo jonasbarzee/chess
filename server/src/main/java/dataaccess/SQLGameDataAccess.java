@@ -1,13 +1,9 @@
-package dataaccess.sqldao;
+package dataaccess;
 
 import chess.ChessGame;
 import chess.ChessGameAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dataaccess.GameDataAccess;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.GameDataAccessException;
-import dataaccess.exceptions.SQLDataAccessException;
 import model.GameData;
 
 import java.sql.SQLException;
