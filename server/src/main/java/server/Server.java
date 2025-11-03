@@ -31,7 +31,7 @@ public class Server {
             DatabaseManager.createDatabase();
             SQLDataAccess.configureDatabase();
         } catch (DataAccessException e) {
-            throw new RuntimeException("Database broke.");
+            throw new RuntimeException("Database broke." + e.getMessage());
         }
 
         javalin.post("/user", new RegisterHandler(userService, errorHandler));
