@@ -46,7 +46,7 @@ public class SQLAuthDataAccess extends SQLDataAccess implements AuthDataAccess {
 
     public boolean isAuthorized(String authToken) throws DataAccessException {
         String statement = "SELECT * FROM auth_data WHERE auth_token = ?;";
-        AuthData authData = queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
+        AuthData authData = queryForObject(statement, rs -> new AuthData(rs.getString("auth_token"), rs.getString("username")), authToken);
         if (authData == null) {
             return false;
         }

@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
+import dataaccess.DataNotFoundException;
 import dataaccess.DatabaseUnavailableException;
 import dataaccess.DuplicateKeyException;
 
@@ -10,6 +11,9 @@ public class ServiceExceptionMapper {
             return new AlreadyTakenException("Username is already taken.");
         } else if (e instanceof DatabaseUnavailableException) {
             return new InternalServerException("Internal Server Error: Database connection failed");
+        } else if (e instanceof DataNotFoundException) {
+            return new UnauthorizedException("Unauthorized");
+
         } else {
             return new InternalServerException("Internal Server Error: Database failure");
 

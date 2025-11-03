@@ -75,7 +75,7 @@ public class GameService {
         return false;
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws UnauthorizedException, AlreadyTakenException, DataAccessException, BadRequestException {
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws ChessServerException {
         String authToken = joinGameRequest.authToken();
         Integer gameID = joinGameRequest.gameID();
         String playerColor = joinGameRequest.playerColor();
@@ -92,37 +92,51 @@ public class GameService {
         String username;
         try {
             username = authDataAccess.getUsername(authToken);
+            System.out.println(username);
+            if (username == null || !authDataAccess.isAuthorized(authToken)) {
+                throw new UnauthorizedException("Unauthorized.");
+            }
 
-        } catch (DataAccessException ex) {
-            throw new UnauthorizedException("Bad Request.");
+        } catch (DataAccessException e) {
+//            throw new UnauthorizedException("Bad Request.");
+            throw ServiceExceptionMapper.map(e);
         }
 
-        if (authDataAccess.isAuthorized(authToken)) {
-            GameData gameData;
+        GameData gameData;
+        try {
             gameData = gameDataAccess.getGame(gameID);
-            if (canJoinAsColor(playerColor, gameID)) {
-
-                switch (playerColor) {
-                    case ("white"):
-                        GameData gameDataToUpdateWhite = new GameData(gameData.gameID(), username, gameData.blackUsername(), gameData.gameName(), gameData.game());
-                        gameDataAccess.updateGameData(gameDataToUpdateWhite);
-                        break;
-                    case ("black"):
-                        GameData gameDataToUpdateBlack = new GameData(gameData.gameID(), gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
-                        gameDataAccess.updateGameData(gameDataToUpdateBlack);
-                        break;
-                    default:
-                        throw new BadRequestException("Bad Request.");
-                }
-                return new JoinGameResult();
+            if (gameData == null) {
+                throw new BadRequestException("Game not found.");
             }
+        } catch (DataAccessException e) {
+            throw new BadRequestException("Game not found.");
+        }
+
+        if (!canJoinAsColor(playerColor, gameID)) {
             throw new AlreadyTakenException("Cannot join with given player color.");
         }
-        throw new UnauthorizedException("Unauthorized.");
+
+        try {
+            switch (playerColor) {
+                case "white" -> {
+                    GameData updateForWhite = new GameData(gameID, username, gameData.blackUsername(), gameData.gameName(), gameData.game());
+                    gameDataAccess.updateGameData(updateForWhite);
+                }
+                case "black" -> {
+                    GameData updateForBlack = new GameData(gameID, gameData.whiteUsername(), username, gameData.gameName(), gameData.game());
+                    gameDataAccess.updateGameData(updateForBlack);
+                }
+            }
+        } catch (DataAccessException e) {
+            throw new UnauthorizedException("error");
+        }
+        return new JoinGameResult();
     }
+
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws ChessServerException {
         String authToken = listGamesRequest.authToken();
+        Collection<ListGamesResultBuilder> listForResult = new ArrayList<>();
 
         try {
             if (!authDataAccess.isAuthorized(authToken)) {
@@ -130,7 +144,6 @@ public class GameService {
             }
 
             Collection<GameData> gamesData = gameDataAccess.getGames();
-            Collection<ListGamesResultBuilder> listForResult = new ArrayList<>();
             for (GameData gameData : gamesData) {
                 Integer gameID = gameData.gameID();
                 String whiteUsername = gameData.whiteUsername();
