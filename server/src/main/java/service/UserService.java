@@ -9,7 +9,6 @@ import chess.result.RegisterResult;
 import dataaccess.AuthDataAccess;
 import dataaccess.UserDataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.SQLDataAccessException;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
@@ -25,7 +24,7 @@ public class UserService {
         this.authDataAccess = authDataAccess;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws AlreadyTakenException, BadRequestException, SQLDataAccessException {
+    public RegisterResult register(RegisterRequest registerRequest) throws ChessServerException {
 
         String username = registerRequest.username();
         String password = registerRequest.password();
@@ -43,62 +42,72 @@ public class UserService {
             userDataAccess.createUser(userData);
             AuthData authData = authDataAccess.create(userData.username());
             return new RegisterResult(authData.username(), authData.authToken());
-        } catch (DataAccessException ex) {
-            throw new AlreadyTakenException("Username is already taken.");
+        } catch (DataAccessException e) {
+            throw ServiceExceptionMapper.map(e);
         }
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws NoUserException, WrongPasswordException, BadRequestException {
+    public LoginResult login(LoginRequest loginRequest) throws ChessServerException {
         String username = loginRequest.username();
         String password = loginRequest.password();
 
-        if (username == null) {
-            throw new BadRequestException("username is null");
-        } else if (!userDataAccess.userExists(username)) {
-            throw new NoUserException("Given username is not registered.");
+        try {
+            if (username == null) {
+                throw new BadRequestException("username is null");
+            } else if (!userDataAccess.userExists(username)) {
+                throw new NoUserException("Given username is not registered.");
+            }
+            UserData userData = userDataAccess.getUser(username);
+            System.out.println(password);
+            String encrypted = userData.password();
+            System.out.println(encrypted);
+            System.out.println(checkPassword(encrypted, password));
+
+            System.out.println("clearPassword: " + password);
+            System.out.println("storedHash: " + encrypted);
+
+            if (encrypted == null) {
+                System.out.println("storedHash is null!");
+            } else if (!encrypted.startsWith("$2")) {
+                System.out.println("storedHash looks invalid!");
+            }
+
+            if (loginRequest.password() == null) {
+                throw new BadRequestException("password is null");
+            } else if (!checkPassword(encrypted, password)) {
+                throw new WrongPasswordException("Given password was incorrect.");
+            }
+
+            AuthData authData = authDataAccess.update(username);
+            return new LoginResult(authData.authToken(), authData.username());
+
+        } catch (DataAccessException e) {
+            throw ServiceExceptionMapper.map(e);
         }
-        UserData userData = userDataAccess.getUser(username);
-        System.out.println(password);
-        String encrypted = userData.password();
-        System.out.println(encrypted);
-        System.out.println(checkPassword(encrypted, password));
-
-        System.out.println("clearPassword: " + password);
-        System.out.println("storedHash: " + encrypted);
-
-        if (encrypted == null) {
-            System.out.println("storedHash is null!");
-        } else if (!encrypted.startsWith("$2")) {
-            System.out.println("storedHash looks invalid!");
-        }
-
-        if (loginRequest.password() == null) {
-            throw new BadRequestException("password is null");
-        } else if (!checkPassword(encrypted, password)) {
-            throw new WrongPasswordException("Given password was incorrect.");
-        }
-
-        AuthData authData = authDataAccess.update(username);
-        return new LoginResult(authData.authToken(), authData.username());
 
     }
 
-    public LogoutResult logout(LogoutRequest logoutRequest) throws UnauthorizedException {
+    public LogoutResult logout(LogoutRequest logoutRequest) throws ChessServerException {
         String authToken = logoutRequest.authToken();
 
-        if (!authDataAccess.isAuthorized(authToken)) {
-            throw new UnauthorizedException("user is not authorized");
+        try {
+            if (!authDataAccess.isAuthorized(authToken)) {
+                throw new UnauthorizedException("user is not authorized");
+            }
+
+            if (authToken == null) {
+                throw new UnauthorizedException("authToken is null");
+            } else if (!authDataAccess.isAuthorized(authToken)) {
+                throw new UnauthorizedException("authToken is bad");
+            }
+            if (authDataAccess.isAuthorized(authToken)) {
+                authDataAccess.delete(authToken);
+            }
+            return new LogoutResult();
+        } catch (DataAccessException e) {
+            throw ServiceExceptionMapper.map(e);
         }
 
-        if (authToken == null) {
-            throw new UnauthorizedException("authToken is null");
-        } else if (!authDataAccess.isAuthorized(authToken)) {
-            throw new UnauthorizedException("authToken is bad");
-        }
-        if (authDataAccess.isAuthorized(authToken)) {
-            authDataAccess.delete(authToken);
-        }
-        return new LogoutResult();
     }
 
     public static String generateToken() {

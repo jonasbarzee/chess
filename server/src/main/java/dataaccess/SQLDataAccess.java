@@ -40,25 +40,19 @@ public abstract class SQLDataAccess {
             );"""
     };
 
-    static public void configureDatabase() throws SQLDataAccessException {
-        try {
-            DatabaseManager.createDatabase();
-            Connection connection = DatabaseManager.getConnection();
-            for (String statement : createStatements) {
-
-                try (PreparedStatement ps = connection.prepareStatement(statement)) {
-                    ps.executeUpdate();
-                } catch (SQLException ex) {
-                    throw new AuthDataAccessException("Unable to configure the database." + ex.getMessage());
-                }
-
+    static public void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        Connection connection = DatabaseManager.getConnection();
+        for (String statement : createStatements) {
+            try (PreparedStatement ps = connection.prepareStatement(statement)) {
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                throw SQLExceptionMapper.map(e);
             }
-        } catch (DataAccessException ex) {
-            throw new SQLDataAccessException(ex.getMessage());
         }
     }
 
-    protected int executeUpdate(String statement, Object... params) throws SQLDataAccessException {
+    protected int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection connection = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -82,12 +76,13 @@ public abstract class SQLDataAccess {
                 // returns affected rows if now auto incrementing id
                 return affectedRows;
             }
-        } catch (Exception ex) {
-            throw new SQLDataAccessException(String.format("couldn't update database: %s, %s", statement, ex.getMessage()));
+        } catch (SQLException e) {
+            throw SQLExceptionMapper.map(e);
         }
     }
 
-    protected <T> T queryForObject(String sqlString, ResultSetMapper<T> mapper, Object... params) throws SQLException {
+    protected <T> T queryForObject(String sqlString, ResultSetMapper<T> mapper, Object... params) throws
+            DataAccessException {
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement ps = connection.prepareStatement(sqlString)) {
 
@@ -101,8 +96,8 @@ public abstract class SQLDataAccess {
                 }
                 return null;
             }
-        } catch (DataAccessException e) {
-            throw new SQLException(String.format("Unable to execute query %s %s", sqlString, e.getMessage()));
+        } catch (SQLException e) {
+            throw SQLExceptionMapper.map(e);
         }
     }
 

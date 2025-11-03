@@ -18,9 +18,9 @@ public class MemGameDataAccess implements GameDataAccess {
         createGameData(gameData);
     }
 
-    public GameData getGame(Integer gameID) throws GameDataAccessException {
+    public GameData getGame(Integer gameID) throws DataAccessException {
         if (!hasGame(gameID)) {
-            throw new GameDataAccessException("No game with given gameID.");
+            throw new DataNotFoundException("No game with given gameID.");
         }
         return gameTable.get(gameID);
     }

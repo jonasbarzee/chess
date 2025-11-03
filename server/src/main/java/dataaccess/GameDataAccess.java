@@ -5,9 +5,9 @@ import model.GameData;
 import java.util.Collection;
 
 public interface GameDataAccess {
-    public void deleteAllGameData();
-    public Integer createGameData(GameData gameData);
-    public GameData getGame(Integer gameID) throws GameDataAccessException;
-    public void updateGameData(GameData gameData);
+    public void deleteAllGameData() throws DataAccessException;
+    public Integer createGameData(GameData gameData) throws DataAccessException;
+    public GameData getGame(Integer gameID) throws DataAccessException;
+    public void updateGameData(GameData gameData) throws DataAccessException;
     public Collection<GameData> getGames();
 }

@@ -17,7 +17,7 @@ public class SQLGameDataAccess extends SQLDataAccess implements GameDataAccess {
         gson = new GsonBuilder().registerTypeAdapter(ChessGame.class, new ChessGameAdapter()).create();
     }
 
-    public Integer createGameData(GameData gameData) {
+    public Integer createGameData(GameData gameData) throws DataAccessException {
         // don't user gameData's gameID when inserting in to the database because the schema auto-increments
         String whiteUser = gameData.whiteUsername();
         String blackUser = gameData.blackUsername();
@@ -31,37 +31,24 @@ public class SQLGameDataAccess extends SQLDataAccess implements GameDataAccess {
 
         String gameJson = gson.toJson(game);
         String statement = "INSERT INTO games (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?);";
-        try {
-            return executeUpdate(statement, whiteUser, blackUser, gameName, gameJson);
-        } catch (SQLDataAccessException e) {
-            throw new RuntimeException("Unable to insert into games table" + e.getMessage());
-        }
+        return executeUpdate(statement, whiteUser, blackUser, gameName, gameJson);
     }
 
-    public void deleteAllGameData() {
+    public void deleteAllGameData() throws DataAccessException {
         String statement = "TRUNCATE TABLE games;";
-        try {
-            executeUpdate(statement);
-        } catch (SQLDataAccessException e) {
-            throw new RuntimeException("Unable to delete data in games table");
-        }
+        executeUpdate(statement);
     }
 
-    public GameData getGame(Integer gameID) throws GameDataAccessException {
-        System.out.println(gameID);
+    public GameData getGame(Integer gameID) throws DataAccessException {
         String statement = "SELECT * FROM games WHERE game_id = ?;";
-        try {
-            return queryForObject(statement, rs -> {
-                ChessGame game = gson.fromJson(rs.getString("chess_game"), ChessGame.class);
-                return new GameData(rs.getInt("game_id"), rs.getString("white_username"),
-                        rs.getString("black_username"), rs.getString("game_name"), game);
-            }, gameID);
-        } catch (SQLException e) {
-            throw new GameDataAccessException(String.format("Unable to get game from games table, %s", e.getMessage()));
-        }
+        return queryForObject(statement, rs -> {
+            ChessGame game = gson.fromJson(rs.getString("chess_game"), ChessGame.class);
+            return new GameData(rs.getInt("game_id"), rs.getString("white_username"),
+                    rs.getString("black_username"), rs.getString("game_name"), game);
+        }, gameID);
     }
 
-    public void updateGameData(GameData gameData) {
+    public void updateGameData(GameData gameData) throws DataAccessException {
         String statement = """
                 
                 UPDATE games
@@ -74,20 +61,7 @@ public class SQLGameDataAccess extends SQLDataAccess implements GameDataAccess {
         String gameName = gameData.gameName();
         Integer gameID = gameData.gameID();
 
-        System.out.println(white);
-        System.out.println(black);
-        System.out.println(gameName);
-        System.out.println(gameID);
-
-        try {
-            int rowsAffected = executeUpdate(statement, white, black, gameName, gameJson, gameID);
-
-            if (rowsAffected == 0) {
-                System.out.println("Game not found or updated");
-            }
-        } catch (SQLDataAccessException e) {
-            throw new RuntimeException("Unable to update data in games table");
-        }
+        executeUpdate(statement, white, black, gameName, gameJson, gameID);
     }
 
     public Collection<GameData> getGames() {

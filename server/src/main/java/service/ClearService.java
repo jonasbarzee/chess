@@ -2,9 +2,9 @@ package service;
 
 import chess.result.ClearDatabaseResult;
 import dataaccess.AuthDataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.GameDataAccess;
 import dataaccess.UserDataAccess;
-import dataaccess.SQLDataAccessException;
 
 public class ClearService {
     private final UserDataAccess userDataAccess;
@@ -17,15 +17,16 @@ public class ClearService {
         this.authDataAccess = authDataAccess;
     }
 
-    public ClearDatabaseResult clearDatabase() {
-        try {
+    public ClearDatabaseResult clearDatabase() throws ChessServerException{
 
+        try {
             userDataAccess.deleteAllUsers();
-        } catch (SQLDataAccessException e) {
-            throw new RuntimeException(e);
+            authDataAccess.deleteAllAuthData();
+            gameDataAccess.deleteAllGameData();
+        } catch (DataAccessException e) {
+            throw ServiceExceptionMapper.map(e);
+
         }
-        gameDataAccess.deleteAllGameData();
-        authDataAccess.deleteAllAuthData();
         return new ClearDatabaseResult();
     }
 }

@@ -8,9 +8,9 @@ import java.util.Map;
 public class MemUserDataAccess implements UserDataAccess {
     private final Map<String, UserData> userTable = new HashMap<>();
 
-    public void createUser(UserData userData) throws UserDataAccessException {
+    public void createUser(UserData userData) throws DataAccessException {
         if (getUser(userData.username()) != null) {
-            throw new UserDataAccessException("User already exists");
+            throw new DuplicateKeyException("User already exists");
         }
         userTable.put(userData.username(), userData);
     }
@@ -26,14 +26,14 @@ public class MemUserDataAccess implements UserDataAccess {
         return userTable.containsKey(username);
     }
 
-    public void updateUser(UserData userData) throws UserDataAccessException {
+    public void updateUser(UserData userData) throws DataAccessException {
         if (getUser(userData.username()) == null) {
-            throw new UserDataAccessException("User does not exist");
+            throw new DataNotFoundException("User does not exist");
         }
         userTable.put(userData.username(), userData);
     }
 
-    public void deleteAllUsers() {
+    public void deleteAllUsers() throws DataAccessException {
         userTable.clear();
     }
 }

@@ -3,12 +3,12 @@ package dataaccess;
 import model.AuthData;
 
 public interface AuthDataAccess {
-    public void deleteAllAuthData();
-    public void delete(String authToken);
-    public boolean isAuthorized(String authToken);
-    public String getUsername(String authToken) throws AuthDataAccessException;
-    public AuthData create(String username) throws AuthDataAccessException;
-    public AuthData update(String username);
+    public void deleteAllAuthData() throws DataAccessException;
+    public void delete(String authToken) throws DataAccessException;
+    public boolean isAuthorized(String authToken) throws DataAccessException;
+    public String getUsername(String authToken) throws DataAccessException;
+    public AuthData create(String username) throws DataAccessException;
+    public AuthData update(String username) throws DataAccessException;
 
 
 }

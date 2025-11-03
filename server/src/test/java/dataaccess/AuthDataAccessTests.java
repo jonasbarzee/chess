@@ -34,7 +34,7 @@ public class AuthDataAccessTests {
 
     @Test
     public void createFailureBadInput() {
-        Assertions.assertThrows(AuthDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             sqlAuthDataAccess.create(null);
         });
     }

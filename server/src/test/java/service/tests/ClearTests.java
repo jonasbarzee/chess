@@ -1,9 +1,7 @@
 package service.tests;
 
 import chess.ChessGame;
-import dataaccess.AuthDataAccessException;
-import dataaccess.GameDataAccessException;
-import dataaccess.UserDataAccessException;
+import dataaccess.DataAccessException;
 import dataaccess.MemAuthDataAccess;
 import dataaccess.MemGameDataAccess;
 import dataaccess.MemUserDataAccess;
@@ -11,7 +9,9 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import service.ChessServerException;
 import service.ClearService;
+import service.ServiceExceptionMapper;
 
 public class ClearTests {
 
@@ -27,20 +27,24 @@ public class ClearTests {
         memAuthDataAccess = new MemAuthDataAccess();
         clearService = new ClearService(memUserDataAccess, memGameDataAccess, memAuthDataAccess);
 
-        clearService.clearDatabase();
+        try {
+            clearService.clearDatabase();
+        } catch (ChessServerException e) {
 
-        Assertions.assertThrows(UserDataAccessException.class, () -> {
+        }
+
+        Assertions.assertThrows(DataAccessException.class, () -> {
             UserData userData = new UserData("username", "password", "email@email.com");
             memUserDataAccess.updateUser(userData);
         });
 
-        Assertions.assertThrows(GameDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             memGameDataAccess.getGame(0);
             memGameDataAccess.getGame(1);
             memGameDataAccess.getGame(10);
         });
 
-        Assertions.assertThrows(AuthDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             memAuthDataAccess.get("username");
             memAuthDataAccess.get("default");
             memAuthDataAccess.get("");
@@ -58,7 +62,7 @@ public class ClearTests {
         UserData userData1 = new UserData("default", "password", "email@email.com");
         UserData userData2 = new UserData("", "password", "email@email.com");
 
-        GameData gameData = new GameData(0,"", "", "", new ChessGame());
+        GameData gameData = new GameData(0, "", "", "", new ChessGame());
         GameData gameData1 = new GameData(1, "", "", "", new ChessGame());
         GameData gameData2 = new GameData(10, "", "", "", new ChessGame());
 
@@ -77,21 +81,25 @@ public class ClearTests {
         });
 
 
-        clearService.clearDatabase();
+        try {
+            clearService.clearDatabase();
+        } catch (ChessServerException e) {
 
-        Assertions.assertThrows(UserDataAccessException.class, () -> {
+        }
+
+        Assertions.assertThrows(DataAccessException.class, () -> {
             memUserDataAccess.updateUser(userData);
             memUserDataAccess.updateUser(userData1);
             memUserDataAccess.updateUser(userData2);
         });
 
-        Assertions.assertThrows(GameDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             memGameDataAccess.getGame(gameData.gameID());
             memGameDataAccess.getGame(gameData1.gameID());
             memGameDataAccess.getGame(gameData2.gameID());
         });
 
-        Assertions.assertThrows(AuthDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             memAuthDataAccess.get(userData.username());
             memAuthDataAccess.get(userData1.username());
             memAuthDataAccess.get(userData2.username());

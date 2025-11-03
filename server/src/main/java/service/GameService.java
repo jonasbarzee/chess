@@ -11,7 +11,6 @@ import chess.result.ListGamesResultBuilder;
 import dataaccess.AuthDataAccess;
 import dataaccess.GameDataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.GameDataAccessException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -29,20 +28,25 @@ public class GameService {
         gameID = 0;
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException {
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws ChessServerException {
 
         if (createGameRequest.gameName() == null) {
             throw new BadRequestException("gameName is null");
         }
 
-        if (authDataAccess.isAuthorized(createGameRequest.authToken())) {
+        try {
+            if (!authDataAccess.isAuthorized(createGameRequest.authToken())) {
+                throw new UnauthorizedException("Unauthorized");
+            }
             // game id is a placeholder right now, the real game id comes back from the database and is returned in the create game result
             gameID += 1;
             GameData gameData = new GameData(gameID, null, null, createGameRequest.gameName(), new ChessGame());
             Integer gameIDToReturn = gameDataAccess.createGameData(gameData);
             return new CreateGameResult(gameIDToReturn);
+        } catch (DataAccessException e) {
+            throw ServiceExceptionMapper.map(e);
         }
-        throw new UnauthorizedException("Unauthorized");
+
     }
 
 
@@ -65,39 +69,37 @@ public class GameService {
                 }
             }
 
-        } catch (GameDataAccessException ex) {
-            throw new BadRequestException("Bad Request.");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
         return false;
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws UnauthorizedException, AlreadyTakenException, GameDataAccessException, BadRequestException {
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws UnauthorizedException, AlreadyTakenException, DataAccessException, BadRequestException {
         String authToken = joinGameRequest.authToken();
         Integer gameID = joinGameRequest.gameID();
         String playerColor = joinGameRequest.playerColor();
 
         if (gameID == null || authToken == null || playerColor == null) {
-            throw new BadRequestException("Bad Request.");
+            throw new BadRequestException("Missing required field.");
         }
         playerColor = playerColor.toLowerCase();
-        if (playerColor.isEmpty() || !playerColor.equals("white") && !playerColor.equals("black")) {
-            throw new BadRequestException("Bad request.");
+        if (!playerColor.equals("white") && !playerColor.equals("black")) {
+            throw new BadRequestException("Invalid player color.");
         }
 
+        // Authorization check before updating through DAO
         String username;
         try {
             username = authDataAccess.getUsername(authToken);
+
         } catch (DataAccessException ex) {
             throw new UnauthorizedException("Bad Request.");
         }
 
         if (authDataAccess.isAuthorized(authToken)) {
             GameData gameData;
-            try {
-                gameData = gameDataAccess.getGame(gameID);
-            } catch (GameDataAccessException ex) {
-                throw new GameDataAccessException("No game with the given gameID.");
-            }
+            gameData = gameDataAccess.getGame(gameID);
             if (canJoinAsColor(playerColor, gameID)) {
 
                 switch (playerColor) {
@@ -119,10 +121,14 @@ public class GameService {
         throw new UnauthorizedException("Unauthorized.");
     }
 
-    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException {
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws ChessServerException {
         String authToken = listGamesRequest.authToken();
 
-        if (authDataAccess.isAuthorized(authToken)) {
+        try {
+            if (!authDataAccess.isAuthorized(authToken)) {
+                throw new UnauthorizedException("Unauthorized");
+            }
+
             Collection<GameData> gamesData = gameDataAccess.getGames();
             Collection<ListGamesResultBuilder> listForResult = new ArrayList<>();
             for (GameData gameData : gamesData) {
@@ -134,7 +140,10 @@ public class GameService {
                 listForResult.add(listGamesResultBuilder);
             }
             return new ListGamesResult(listForResult);
+
+        } catch (DataAccessException e) {
+            throw ServiceExceptionMapper.map(e);
         }
-        throw new UnauthorizedException("Unauthorized.");
+
     }
 }

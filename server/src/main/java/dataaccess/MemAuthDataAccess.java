@@ -7,7 +7,7 @@ import java.util.*;
 public class MemAuthDataAccess implements AuthDataAccess {
     private final Map<String, AuthData> authTable = new HashMap<>();
 
-    public AuthData create(String username) throws AuthDataAccessException {
+    public AuthData create(String username) throws DataAccessException {
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, username);
         authTable.put(authData.authToken(), authData);
@@ -21,20 +21,20 @@ public class MemAuthDataAccess implements AuthDataAccess {
         return authData;
     }
 
-    public AuthData get(String authToken) throws AuthDataAccessException {
+    public AuthData get(String authToken) throws DataAccessException {
         if (!isAuthorized(authToken)) {
-            throw new AuthDataAccessException("Unauthorized");
+            throw new DataAccessException("Unauthorized");
         }
         return authTable.get(authToken);
     }
 
-    public String getUsername(String authToken) throws AuthDataAccessException {
+    public String getUsername(String authToken) throws DataAccessException {
         for (AuthData authData : authTable.values()) {
             if (authData.authToken().equals(authToken)) {
                 return authData.username();
             }
         }
-        throw new AuthDataAccessException("Unauthorized");
+        throw new DataAccessException("Unauthorized");
     }
 
     public void delete(String authToken) {

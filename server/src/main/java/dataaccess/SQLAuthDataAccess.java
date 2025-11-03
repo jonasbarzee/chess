@@ -12,89 +12,57 @@ public class SQLAuthDataAccess extends SQLDataAccess implements AuthDataAccess {
     public SQLAuthDataAccess() {
     }
 
-    public AuthData create(String username) throws AuthDataAccessException {
+    public AuthData create(String username) throws DataAccessException {
         String authToken = generateToken();
 
         String statement = "INSERT INTO auth_data (auth_token, username) VALUES (?, ?)";
-        try {
-            executeUpdate(statement, authToken, username);
-            return new AuthData(authToken, username);
-        } catch (SQLDataAccessException e) {
-            throw new AuthDataAccessException(String.format("Unable to insert into auth_data, %s", e.getMessage()));
-        }
+        executeUpdate(statement, authToken, username);
+        return new AuthData(authToken, username);
     }
 
-    public AuthData update(String username) {
+    public AuthData update(String username) throws DataAccessException {
         String authToken = generateToken();
 
         String statement = "INSERT INTO auth_data (auth_token, username) VALUES (?, ?)";
-        try {
-            executeUpdate(statement, authToken, username);
-            return new AuthData(authToken, username);
-        } catch (SQLDataAccessException e) {
-            System.out.println("SWALLOWED ERROR");
-            return null;
-        }
+        executeUpdate(statement, authToken, username);
+        return new AuthData(authToken, username);
+
     }
 
-    public AuthData get(String authToken) throws AuthDataAccessException {
+    public AuthData get(String authToken) throws DataAccessException {
         String statement = "SELECT * FROM auth_data WHERE auth_token = ?;";
-        try {
-            return queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
-        } catch (SQLException e) {
-            throw new AuthDataAccessException("Unable to read from auth_data");
-        }
+        return queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
     }
 
-    public void delete(String authToken) {
+    public void delete(String authToken) throws DataAccessException {
         String statement = "DELETE FROM auth_data WHERE auth_token = ?;";
-        try {
-            executeUpdate(statement, authToken);
-        } catch (SQLDataAccessException e) {
-            System.out.println("SWALLOWED ERROR");
-        }
+        executeUpdate(statement, authToken);
     }
 
-    public void deleteAllAuthData() {
+    public void deleteAllAuthData() throws DataAccessException {
         String statement = "TRUNCATE TABLE auth_data;";
-        try {
-            executeUpdate(statement);
-        } catch (SQLDataAccessException e) {
-            System.out.println("SWALLOWED ERROR");
-        }
+        executeUpdate(statement);
     }
 
-    public boolean isAuthorized(String authToken) {
+    public boolean isAuthorized(String authToken) throws DataAccessException {
         String statement = "SELECT * FROM auth_data WHERE auth_token = ?;";
-        try {
-            AuthData authData = queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
-            if (authData == null) {
-                return false;
-            }
-            return true;
-        } catch (SQLException e) {
-            System.out.println("SWALLOWED ERROR");
+        AuthData authData = queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
+        if (authData == null) {
             return false;
         }
+        return true;
     }
 
-    public String getUsername(String authToken) throws AuthDataAccessException {
+    public String getUsername(String authToken) throws DataAccessException {
         String statement = "SELECT * FROM auth_data WHERE auth_token = ?;";
-        try {
-            AuthData authData = queryForObject(statement, rs -> new AuthData(rs.getString("auth_token"), rs.getString("username")), authToken);
-            if (authData == null) {
-                throw new AuthDataAccessException("Unable to read from auth_data.");
-            }
-            System.out.println(authData.username());
-            return authData.username();
-        } catch (SQLException e) {
-            throw new AuthDataAccessException("Unable to read from auth_data");
+        AuthData authData = queryForObject(statement, rs -> new AuthData(rs.getString("auth_token"), rs.getString("username")), authToken);
+        if (authData == null) {
+            throw new DataNotFoundException("Unable to read from auth_data.");
         }
+        return authData.username();
     }
 
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
-
-
 }

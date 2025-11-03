@@ -37,7 +37,7 @@ public class UserDataAccessTests {
 
     @Test
     public void createFailureBadInput() {
-        Assertions.assertThrows(UserDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             UserData userData = new UserData(null, null, null);
             sqlUserDataAccess.createUser(userData);
         });
@@ -79,7 +79,7 @@ public class UserDataAccessTests {
 
     @Test
     public void updateFailureBadInput() {
-        Assertions.assertThrows(UserDataAccessException.class, () -> {
+        Assertions.assertThrows(DataAccessException.class, () -> {
             UserData userData = new UserData("user1", "password", "email@email.com");
             sqlUserDataAccess.createUser(userData);
             UserData userDataToUpdate = new UserData("user1", null, null);
