@@ -1,9 +1,5 @@
-package service.tests;
+package dataaccess;
 
-import dataaccess.AuthDataAccessException;
-import dataaccess.DatabaseManager;
-import dataaccess.SQLAuthDataAccess;
-import dataaccess.SQLDataAccess;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 
