@@ -10,7 +10,7 @@ public abstract class SQLDataAccess {
 
 
     private static final String[] createStatements = {
-            "USE chess;",
+//            "USE chess;",
 
             """
             CREATE TABLE IF NOT EXISTS users (
@@ -49,7 +49,7 @@ public abstract class SQLDataAccess {
                 try (PreparedStatement ps = connection.prepareStatement(statement)) {
                     ps.executeUpdate();
                 } catch (SQLException ex) {
-                    throw new AuthDataAccessException("Unable to configure the database.");
+                    throw new AuthDataAccessException("Unable to configure the database." + ex.getMessage());
                 }
 
             }
