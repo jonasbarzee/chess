@@ -1,7 +1,7 @@
 package service;
 
-public class WrongPasswordException extends ServiceException {
+public class WrongPasswordException extends ChessServerException {
     public WrongPasswordException(String message) {
-        super(message);
+        super(message, 401);
     }
 }

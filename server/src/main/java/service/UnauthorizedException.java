@@ -1,7 +1,7 @@
 package service;
 
-public class UnauthorizedException extends ServiceException {
+public class UnauthorizedException extends ChessServerException {
     public UnauthorizedException(String message) {
-        super(message);
+        super(message, 403);
     }
 }

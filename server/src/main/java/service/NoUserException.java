@@ -1,7 +1,7 @@
 package service;
 
-public class NoUserException extends ServiceException {
+public class NoUserException extends ChessServerException {
     public NoUserException(String message) {
-        super(message);
+        super(message, 401);
     }
 }
