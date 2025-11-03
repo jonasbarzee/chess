@@ -1,8 +1,6 @@
 package server;
 
-import dataaccess.SQLAuthDataAccess;
-import dataaccess.SQLGameDataAccess;
-import dataaccess.SQLUserDataAccess;
+import dataaccess.*;
 import handler.*;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
@@ -28,6 +26,13 @@ public class Server {
         GameService gameService = new GameService(gameDataAccess, authDataAccess);
         ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);
         ErrorHandler errorHandler = new ErrorHandler();
+
+        try {
+            DatabaseManager.createDatabase();
+            SQLDataAccess.configureDatabase();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database broke.");
+        }
 
         javalin.post("/user", new RegisterHandler(userService, errorHandler));
 
