@@ -1,4 +1,4 @@
-package sql.tests;
+package service.tests;
 
 import dataaccess.exceptions.AuthDataAccessException;
 import dataaccess.sqldao.DatabaseManager;
