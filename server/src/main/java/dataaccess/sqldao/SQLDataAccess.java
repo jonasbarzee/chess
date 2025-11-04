@@ -11,7 +11,7 @@ import static java.sql.Types.NULL;
 public abstract class SQLDataAccess {
 
 
-    private static final String[] CreateStatements = {
+    private static final String[] Create_Statements = {
 //            "USE chess;",
 
             """
@@ -45,7 +45,7 @@ public abstract class SQLDataAccess {
     static public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         Connection connection = DatabaseManager.getConnection();
-        for (String statement : CreateStatements) {
+        for (String statement : Create_Statements) {
             try (PreparedStatement ps = connection.prepareStatement(statement)) {
                 ps.executeUpdate();
             } catch (SQLException e) {
