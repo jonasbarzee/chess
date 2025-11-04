@@ -11,9 +11,7 @@ import static java.sql.Types.NULL;
 public abstract class SQLDataAccess {
 
 
-    private static final String[] Create_Statements = {
-//            "USE chess;",
-
+    private static final String[] CREATE_STATEMENTS = {
             """
             CREATE TABLE IF NOT EXISTS users (
                 username VARCHAR(50) PRIMARY KEY,
@@ -45,7 +43,7 @@ public abstract class SQLDataAccess {
     static public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         Connection connection = DatabaseManager.getConnection();
-        for (String statement : Create_Statements) {
+        for (String statement : CREATE_STATEMENTS) {
             try (PreparedStatement ps = connection.prepareStatement(statement)) {
                 ps.executeUpdate();
             } catch (SQLException e) {
