@@ -1,6 +1,7 @@
 package server;
 
-import dataaccess.*;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.sqldao.*;
 import handler.*;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
@@ -22,9 +23,6 @@ public class Server {
         SQLUserDataAccess userDataAccess = new SQLUserDataAccess();
         SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
         SQLGameDataAccess gameDataAccess = new SQLGameDataAccess();
-//        MemGameDataAccess gameDataAccess = new MemGameDataAccess();
-//        MemAuthDataAccess authDataAccess = new MemAuthDataAccess();
-//        MemUserDataAccess userDataAccess = new MemUserDataAccess();
         UserService userService = new UserService(userDataAccess, authDataAccess);
         GameService gameService = new GameService(gameDataAccess, authDataAccess);
         ClearService clearService = new ClearService(userDataAccess, gameDataAccess, authDataAccess);

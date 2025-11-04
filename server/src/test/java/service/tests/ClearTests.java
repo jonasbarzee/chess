@@ -1,17 +1,16 @@
 package service.tests;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.MemAuthDataAccess;
-import dataaccess.MemGameDataAccess;
-import dataaccess.MemUserDataAccess;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.memorydao.MemAuthDataAccess;
+import dataaccess.memorydao.MemGameDataAccess;
+import dataaccess.memorydao.MemUserDataAccess;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.ChessServerException;
 import service.ClearService;
-import service.ServiceExceptionMapper;
 
 public class ClearTests {
 

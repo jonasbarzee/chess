@@ -1,4 +1,8 @@
-package dataaccess;
+package dataaccess.sqldao;
+
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DatabaseUnavailableException;
+import dataaccess.exceptions.DuplicateKeyException;
 
 import java.sql.SQLException;
 

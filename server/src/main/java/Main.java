@@ -6,13 +6,5 @@ public class Main {
         server.run(8080);
 
         System.out.println("♕ 240 Chess Server");
-
-
-//        try {
-//            SQLDataAccess.configureDatabase();
-//        } catch (SQLDataAccessException e) {
-//            throw new Exception("Error");
-//        }
-
     }
 } 

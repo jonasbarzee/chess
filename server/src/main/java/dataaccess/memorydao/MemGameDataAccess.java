@@ -1,5 +1,8 @@
-package dataaccess;
+package dataaccess.memorydao;
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DataNotFoundException;
+import dataaccess.interfaces.GameDataAccess;
 import model.GameData;
 
 import java.util.Collection;

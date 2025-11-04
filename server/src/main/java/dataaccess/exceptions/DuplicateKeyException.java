@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.exceptions;
 
 public class DuplicateKeyException extends DataAccessException {
     public DuplicateKeyException(String message, Throwable cause) {

@@ -1,9 +1,9 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.DataNotFoundException;
-import dataaccess.DatabaseUnavailableException;
-import dataaccess.DuplicateKeyException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DataNotFoundException;
+import dataaccess.exceptions.DatabaseUnavailableException;
+import dataaccess.exceptions.DuplicateKeyException;
 
 public class ServiceExceptionMapper {
     public static ChessServerException map(DataAccessException e) {

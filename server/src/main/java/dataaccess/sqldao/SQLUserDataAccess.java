@@ -1,8 +1,8 @@
-package dataaccess;
+package dataaccess.sqldao;
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.interfaces.UserDataAccess;
 import model.UserData;
-
-import java.sql.SQLException;
 
 public class SQLUserDataAccess extends SQLDataAccess implements UserDataAccess {
     public SQLUserDataAccess() {
@@ -20,12 +20,18 @@ public class SQLUserDataAccess extends SQLDataAccess implements UserDataAccess {
 
     public UserData getUser(String username) throws DataAccessException {
         String statement = "SELECT * FROM users WHERE username = ?;";
-        return queryForObject(statement, rs -> new UserData(rs.getString("username"), rs.getString("password_hash"), rs.getString("email")), username);
+        return queryForObject(statement,
+                rs -> new UserData(rs.getString("username"),
+                        rs.getString("password_hash"),
+                        rs.getString("email")), username);
     }
 
     public boolean userExists(String username) throws DataAccessException {
         String statement = "SELECT * FROM users WHERE username = ?;";
-        UserData userData = queryForObject(statement, rs -> new UserData(rs.getString("username"), rs.getString("password_hash"), rs.getString("email")), username);
+        UserData userData = queryForObject(statement,
+                rs -> new UserData(rs.getString("username"),
+                        rs.getString("password_hash"),
+                        rs.getString("email")), username);
         if (userData == null) {
             return false;
         }

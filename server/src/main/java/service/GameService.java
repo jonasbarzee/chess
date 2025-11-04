@@ -8,9 +8,9 @@ import chess.result.CreateGameResult;
 import chess.result.JoinGameResult;
 import chess.result.ListGamesResult;
 import chess.result.ListGamesResultBuilder;
-import dataaccess.AuthDataAccess;
-import dataaccess.GameDataAccess;
-import dataaccess.DataAccessException;
+import dataaccess.interfaces.AuthDataAccess;
+import dataaccess.interfaces.GameDataAccess;
+import dataaccess.exceptions.DataAccessException;
 import model.GameData;
 
 import java.util.ArrayList;

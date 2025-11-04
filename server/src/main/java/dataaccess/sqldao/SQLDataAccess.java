@@ -1,6 +1,8 @@
-package dataaccess;
+package dataaccess.sqldao;
 
 import chess.ChessGame;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.interfaces.ResultSetMapper;
 
 import java.sql.*;
 
@@ -9,7 +11,7 @@ import static java.sql.Types.NULL;
 public abstract class SQLDataAccess {
 
 
-    private static final String[] createStatements = {
+    private static final String[] CreateStatements = {
 //            "USE chess;",
 
             """
@@ -43,7 +45,7 @@ public abstract class SQLDataAccess {
     static public void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         Connection connection = DatabaseManager.getConnection();
-        for (String statement : createStatements) {
+        for (String statement : CreateStatements) {
             try (PreparedStatement ps = connection.prepareStatement(statement)) {
                 ps.executeUpdate();
             } catch (SQLException e) {

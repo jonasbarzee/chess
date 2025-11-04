@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.exceptions;
 
 public class DataNotFoundException extends DataAccessException {
     public DataNotFoundException(String message, Throwable cause) {

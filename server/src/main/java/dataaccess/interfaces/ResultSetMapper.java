@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

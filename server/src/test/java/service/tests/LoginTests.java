@@ -6,10 +6,11 @@ import chess.request.RegisterRequest;
 import chess.result.LoginResult;
 import chess.result.LogoutResult;
 import chess.result.RegisterResult;
-import dataaccess.MemAuthDataAccess;
-import dataaccess.MemUserDataAccess;
+import dataaccess.memorydao.MemAuthDataAccess;
+import dataaccess.memorydao.MemUserDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.NoUserException;
 import service.UnauthorizedException;
@@ -19,18 +20,15 @@ import service.UserService;
 public class LoginTests {
 
     private UserService userService;
-    private MemUserDataAccess memUserDataAccess;
-    private MemAuthDataAccess memAuthDataAccess;
+    private final UserData userData = new UserData("username", "password", "email@email.com");
+    private final RegisterRequest registerRequest = new RegisterRequest(userData.username(), userData.password(), userData.email());
+    private final LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
 
-    @Test
-    public void loginSuccess() {
-        memUserDataAccess = new MemUserDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
+    @BeforeEach
+    public void setup() {
+        MemUserDataAccess memUserDataAccess = new MemUserDataAccess();
+        MemAuthDataAccess memAuthDataAccess = new MemAuthDataAccess();
         userService = new UserService(memUserDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
-        RegisterRequest registerRequest = new RegisterRequest(userData.username(), userData.password(), userData.email());
 
         Assertions.assertDoesNotThrow(() -> {
             RegisterResult registerResult = userService.register(registerRequest);
@@ -38,9 +36,10 @@ public class LoginTests {
             Assertions.assertNotNull(registerResult.username());
             Assertions.assertNotNull(registerResult.authToken());
         });
+    }
 
-        LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
-
+    @Test
+    public void loginSuccess() {
         Assertions.assertDoesNotThrow(() -> {
             LoginResult loginResult = userService.login(loginRequest);
             Assertions.assertNotNull(loginResult);
@@ -51,21 +50,6 @@ public class LoginTests {
 
     @Test
     public void loginFailureWrongUsername() {
-        memUserDataAccess = new MemUserDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        userService = new UserService(memUserDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
-        RegisterRequest registerRequest = new RegisterRequest(userData.username(), userData.password(), userData.email());
-
-        Assertions.assertDoesNotThrow(() -> {
-            RegisterResult registerResult = userService.register(registerRequest);
-            Assertions.assertNotNull(registerResult);
-            Assertions.assertNotNull(registerResult.username());
-            Assertions.assertNotNull(registerResult.authToken());
-        });
-
         LoginRequest loginRequest = new LoginRequest("wrong username", userData.password());
 
         Assertions.assertThrows(NoUserException.class, () -> {
@@ -75,21 +59,6 @@ public class LoginTests {
 
     @Test
     public void loginFailureWrongPassword() {
-        memUserDataAccess = new MemUserDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        userService = new UserService(memUserDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
-        RegisterRequest registerRequest = new RegisterRequest(userData.username(), userData.password(), userData.email());
-
-        Assertions.assertDoesNotThrow(() -> {
-            RegisterResult registerResult = userService.register(registerRequest);
-            Assertions.assertNotNull(registerResult);
-            Assertions.assertNotNull(registerResult.username());
-            Assertions.assertNotNull(registerResult.authToken());
-        });
-
         LoginRequest loginRequest = new LoginRequest(userData.username(), "wrong password");
 
         Assertions.assertThrows(WrongPasswordException.class, () -> {
@@ -99,23 +68,6 @@ public class LoginTests {
 
     @Test
     public void logoutSuccess() {
-        memUserDataAccess = new MemUserDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        userService = new UserService(memUserDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
-        RegisterRequest registerRequest = new RegisterRequest(userData.username(), userData.password(), userData.email());
-
-        Assertions.assertDoesNotThrow(() -> {
-            RegisterResult registerResult = userService.register(registerRequest);
-            Assertions.assertNotNull(registerResult);
-            Assertions.assertNotNull(registerResult.username());
-            Assertions.assertNotNull(registerResult.authToken());
-        });
-
-        LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
-
         Assertions.assertDoesNotThrow(() -> {
             LoginResult loginResult = userService.login(loginRequest);
             Assertions.assertNotNull(loginResult);
@@ -132,23 +84,6 @@ public class LoginTests {
 
     @Test
     public void logoutFailureBadToken() {
-        memUserDataAccess = new MemUserDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        userService = new UserService(memUserDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
-        RegisterRequest registerRequest = new RegisterRequest(userData.username(), userData.password(), userData.email());
-
-        Assertions.assertDoesNotThrow(() -> {
-            RegisterResult registerResult = userService.register(registerRequest);
-            Assertions.assertNotNull(registerResult);
-            Assertions.assertNotNull(registerResult.username());
-            Assertions.assertNotNull(registerResult.authToken());
-        });
-
-        LoginRequest loginRequest = new LoginRequest(userData.username(), userData.password());
-
         Assertions.assertThrows(UnauthorizedException.class, () -> {
             LoginResult loginResult = userService.login(loginRequest);
             Assertions.assertNotNull(loginResult);

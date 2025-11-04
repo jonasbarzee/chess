@@ -1,9 +1,11 @@
-package dataaccess;
+package dataaccess.sqldao;
 
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DataNotFoundException;
+import dataaccess.interfaces.AuthDataAccess;
 import model.AuthData;
 
-import java.sql.SQLException;
 import java.util.UUID;
 
 

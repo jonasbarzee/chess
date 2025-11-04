@@ -5,12 +5,13 @@ import chess.request.JoinGameRequest;
 import chess.request.ListGamesRequest;
 import chess.result.CreateGameResult;
 import chess.result.ListGamesResult;
-import dataaccess.MemAuthDataAccess;
-import dataaccess.MemGameDataAccess;
-import dataaccess.MemUserDataAccess;
+import dataaccess.memorydao.MemAuthDataAccess;
+import dataaccess.memorydao.MemGameDataAccess;
+import dataaccess.memorydao.MemUserDataAccess;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.AlreadyTakenException;
 import service.GameService;
@@ -22,16 +23,19 @@ public class GameTests {
     private MemGameDataAccess memGameDataAccess;
     private MemAuthDataAccess memAuthDataAccess;
     private MemUserDataAccess memUserDataAccess;
+    private final UserData userData = new UserData("username", "password", "email@email.com");
+    private final UserData userData1 = new UserData("username1", "password1", "email1@email.com");
 
-    @Test
-    public void createGameSuccess() {
+    @BeforeEach
+    public void setup() {
         memGameDataAccess = new MemGameDataAccess();
         memAuthDataAccess = new MemAuthDataAccess();
         memUserDataAccess = new MemUserDataAccess();
         gameService = new GameService(memGameDataAccess, memAuthDataAccess);
+    }
 
-        UserData userData = new UserData("username", "password", "email@email.com");
-
+    @Test
+    public void createGameSuccess() {
         Assertions.assertDoesNotThrow(() -> {
             memUserDataAccess.createUser(userData);
             AuthData authData = memAuthDataAccess.create(userData.username());
@@ -40,16 +44,8 @@ public class GameTests {
         });
     }
 
-    // Should I have to register before I can create a game??
     @Test
     public void createGameFailureNotAuthorized() {
-        memGameDataAccess = new MemGameDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
         Assertions.assertThrows(UnauthorizedException.class, () -> {
             CreateGameRequest createGameRequest = new CreateGameRequest("mygame", memAuthDataAccess.generateToken());
             gameService.createGame(createGameRequest);
@@ -58,17 +54,10 @@ public class GameTests {
 
     @Test
     public void joinGameSuccessWhite() {
-        memGameDataAccess = new MemGameDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
         Assertions.assertDoesNotThrow(() -> {
             memUserDataAccess.createUser(userData);
             AuthData authData = memAuthDataAccess.create(userData.username());
-            CreateGameRequest createGameRequest = new CreateGameRequest("mygame", authData.authToken());
+            CreateGameRequest createGameRequest = new CreateGameRequest("myGame", authData.authToken());
             CreateGameResult createGameResult = gameService.createGame(createGameRequest);
             JoinGameRequest joinGameRequest = new JoinGameRequest(authData.authToken(), "white", createGameResult.gameID());
             gameService.joinGame(joinGameRequest);
@@ -77,13 +66,6 @@ public class GameTests {
 
     @Test
     public void joinGameSuccessBlack() {
-        memGameDataAccess = new MemGameDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-
         Assertions.assertDoesNotThrow(() -> {
             memUserDataAccess.createUser(userData);
             AuthData authData = memAuthDataAccess.create(userData.username());
@@ -96,14 +78,6 @@ public class GameTests {
 
     @Test
     public void joinGameFailureWhiteAlreadyTaken() {
-        memGameDataAccess = new MemGameDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-        UserData userData1 = new UserData("username1", "password1", "email1@email.com");
-
         Assertions.assertDoesNotThrow(() -> {
             memUserDataAccess.createUser(userData);
             AuthData authData = memAuthDataAccess.create(userData.username());
@@ -124,14 +98,6 @@ public class GameTests {
 
     @Test
     public void getGamesSuccess() {
-        memGameDataAccess = new MemGameDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-        UserData userData1 = new UserData("username1", "password1", "email1@email.com");
-
         Assertions.assertDoesNotThrow(() -> {
             memUserDataAccess.createUser(userData);
             AuthData authData = memAuthDataAccess.create(userData.username());
@@ -155,15 +121,6 @@ public class GameTests {
 
     @Test
     public void getGamesFailureUnauthorized() {
-        memGameDataAccess = new MemGameDataAccess();
-        memAuthDataAccess = new MemAuthDataAccess();
-        memUserDataAccess = new MemUserDataAccess();
-        gameService = new GameService(memGameDataAccess, memAuthDataAccess);
-
-
-        UserData userData = new UserData("username", "password", "email@email.com");
-        UserData userData1 = new UserData("username1", "password1", "email1@email.com");
-
         Assertions.assertDoesNotThrow(() -> {
             memUserDataAccess.createUser(userData);
             AuthData authData = memAuthDataAccess.create(userData.username());

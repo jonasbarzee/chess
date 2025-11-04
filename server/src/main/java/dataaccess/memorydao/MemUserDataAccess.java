@@ -1,5 +1,9 @@
-package dataaccess;
+package dataaccess.memorydao;
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DataNotFoundException;
+import dataaccess.exceptions.DuplicateKeyException;
+import dataaccess.interfaces.UserDataAccess;
 import model.UserData;
 
 import java.util.HashMap;

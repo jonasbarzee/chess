@@ -1,10 +1,10 @@
 package service;
 
 import chess.result.ClearDatabaseResult;
-import dataaccess.AuthDataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.GameDataAccess;
-import dataaccess.UserDataAccess;
+import dataaccess.interfaces.AuthDataAccess;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.interfaces.GameDataAccess;
+import dataaccess.interfaces.UserDataAccess;
 
 public class ClearService {
     private final UserDataAccess userDataAccess;

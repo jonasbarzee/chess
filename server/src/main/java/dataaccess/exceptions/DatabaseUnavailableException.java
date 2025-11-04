@@ -1,6 +1,4 @@
-package dataaccess;
-
-import javax.xml.crypto.Data;
+package dataaccess.exceptions;
 
 public class DatabaseUnavailableException extends DataAccessException {
     public DatabaseUnavailableException(String message, Throwable cause) {
