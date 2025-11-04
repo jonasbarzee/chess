@@ -117,4 +117,42 @@ public class UserDataAccessTests {
         });
 
     }
+
+    @Test
+    public void deleteAllUsersSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            UserData userData1 = new UserData("user1", "password", "email1@email.com");
+            UserData userData2 = new UserData("user2", "password", "email2@email.com");
+            UserData userData3 = new UserData("user3", "password", "email3@email.com");
+
+            sqlUserDataAccess.createUser(userData1);
+            sqlUserDataAccess.createUser(userData2);
+            sqlUserDataAccess.createUser(userData3);
+
+            sqlUserDataAccess.deleteAllUsers();
+        });
+    }
+
+    @Test
+    public void deleteAllUsersNegative() {
+        Assertions.assertDoesNotThrow(() -> {
+            sqlUserDataAccess.deleteAllUsers();
+        });
+    }
+
+    @Test
+    public void userExistsSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            UserData userData1 = new UserData("user1", "password", "email1@email.com");
+            sqlUserDataAccess.createUser(userData1);
+            assert sqlUserDataAccess.userExists(userData1.username());
+        });
+    }
+
+    @Test
+    public void userExistsFailure() {
+        Assertions.assertDoesNotThrow(() -> {
+            assert !sqlUserDataAccess.userExists("fakeUser");
+        });
+    }
 }

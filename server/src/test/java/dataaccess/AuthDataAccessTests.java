@@ -40,6 +40,21 @@ public class AuthDataAccessTests {
     }
 
     @Test
+    public void updateSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            sqlAuthDataAccess.create("user1");
+            sqlAuthDataAccess.update("user1");
+        });
+    }
+
+    @Test
+    public void updateFailure() {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            sqlAuthDataAccess.update(null);
+        });
+    }
+
+    @Test
     public void getSuccess() {
         Assertions.assertDoesNotThrow(() -> {
             AuthData authData = sqlAuthDataAccess.create("user1");
@@ -78,5 +93,58 @@ public class AuthDataAccessTests {
             sqlAuthDataAccess.delete("authToken");
         });
 
+    }
+
+    @Test
+    public void deleteAllAuthDataSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+
+            sqlAuthDataAccess.create("user1");
+            sqlAuthDataAccess.create("user2");
+            sqlAuthDataAccess.create("user3");
+            sqlAuthDataAccess.create("user1");
+
+            sqlAuthDataAccess.deleteAllAuthData();
+        });
+
+    }
+
+    @Test
+    public void deleteAllauthDataNegative() {
+        Assertions.assertDoesNotThrow(() -> {
+            sqlAuthDataAccess.deleteAllAuthData();
+        });
+
+    }
+
+    @Test
+    public void isAuthorizedSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            AuthData authData = sqlAuthDataAccess.create("user1");
+            assert sqlAuthDataAccess.isAuthorized(authData.authToken());
+        });
+    }
+
+    @Test
+    public void isAuthorizedNegative() {
+        Assertions.assertDoesNotThrow(() -> {
+            assert !sqlAuthDataAccess.isAuthorized("fakeToken");
+        });
+    }
+
+    @Test
+    public void getUsernameSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            AuthData authData = sqlAuthDataAccess.create("user1");
+            String username = sqlAuthDataAccess.getUsername(authData.authToken());
+            Assertions.assertNotNull(username);
+        });
+    }
+
+    @Test
+    public void getUsernameNegative() {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            sqlAuthDataAccess.getUsername("fakeToken");
+        });
     }
 }
