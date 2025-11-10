@@ -1,9 +1,7 @@
 package handler;
 
 import chess.request.LogoutRequest;
-import chess.request.RegisterRequest;
 import chess.result.LogoutResult;
-import chess.result.RegisterResult;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import service.UserService;

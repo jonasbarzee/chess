@@ -92,7 +92,7 @@ public class GameService {
         String username;
         try {
             username = authDataAccess.getUsername(authToken);
-            System.out.println(username);
+
             if (username == null || !authDataAccess.isAuthorized(authToken)) {
                 throw new UnauthorizedException("Unauthorized.");
             }

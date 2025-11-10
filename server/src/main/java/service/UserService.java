@@ -57,20 +57,9 @@ public class UserService {
             } else if (!userDataAccess.userExists(username)) {
                 throw new NoUserException("Given username is not registered.");
             }
+
             UserData userData = userDataAccess.getUser(username);
-            System.out.println(password);
             String encrypted = userData.password();
-            System.out.println(encrypted);
-            System.out.println(checkPassword(encrypted, password));
-
-            System.out.println("clearPassword: " + password);
-            System.out.println("storedHash: " + encrypted);
-
-            if (encrypted == null) {
-                System.out.println("storedHash is null!");
-            } else if (!encrypted.startsWith("$2")) {
-                System.out.println("storedHash looks invalid!");
-            }
 
             if (loginRequest.password() == null) {
                 throw new BadRequestException("password is null");

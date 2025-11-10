@@ -25,13 +25,8 @@ public class SQLGameDataAccess extends SQLDataAccess implements GameDataAccess {
         String blackUser = gameData.blackUsername();
         String gameName = gameData.gameName();
         ChessGame game = gameData.game();
-
-        System.out.println(whiteUser);
-        System.out.println(blackUser);
-        System.out.println(gameName);
-        System.out.println(game);
-
         String gameJson = gson.toJson(game);
+
         String statement = "INSERT INTO games (white_username, black_username, game_name, chess_game) VALUES (?, ?, ?, ?);";
         return executeUpdate(statement, whiteUser, blackUser, gameName, gameJson);
     }
