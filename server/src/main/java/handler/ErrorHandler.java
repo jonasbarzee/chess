@@ -7,18 +7,31 @@ import java.util.Map;
 
 public class ErrorHandler {
     public void handleError(Context context, Exception e) {
+        int status;
+        String error;
+        String message = "Error: " + e.getMessage();
         if (e instanceof BadRequestException) {
-            context.status(400).json(Map.of("message", "Error: Unauthorized"));
+            status = 400;
+            error = "BadRequestError";
         } else if (e instanceof NoUserException) {
-            context.status(401).json(Map.of("message", "Error: Unauthorized"));
+            status = 401;
+            error = "NoUserError";
         } else if (e instanceof WrongPasswordException) {
-            context.status(401).json(Map.of("message", "Error: Unauthorized"));
+            status = 401;
+            error = "WrongPasswordError";
         } else if (e instanceof UnauthorizedException) {
-            context.status(401).json(Map.of("message", "Error: Unauthorized"));
+            status = 401;
+            error = "UnauthorizedError";
         } else if (e instanceof AlreadyTakenException) {
-            context.status(403).json(Map.of("message", "Error" + e.getMessage()));
+            status = 403;
+            error = "AlreadyTakenError";
         } else {
-            context.status(500).json(Map.of("message", "Error!!: " + e.getMessage()));
+            status = 500;
+            error = "ServerError";
         }
+        context.status(status).json(Map.of(
+                "message", message,
+                "status", error
+        ));
     }
 }

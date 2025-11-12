@@ -1,7 +1,6 @@
 package ui;
 
 import exception.ResponseException;
-import org.xml.sax.ErrorHandler;
 
 public class ExceptionHandler {
 
@@ -13,6 +12,12 @@ public class ExceptionHandler {
             return switch (re.code()) {
                 case ClientError -> "Client error: " + re.getMessage();
                 case ServerError -> "Server error. Please try again later.";
+                case UnauthorizedError -> "Unauthorized.";
+                case NoUserError -> "Unauthorized.";
+                case WrongPasswordError -> "Unauthorized.";
+                case AlreadyTakenError -> "Username already taken.";
+                case BadRequestError -> "Bad Request.";
+
             };
         }
 

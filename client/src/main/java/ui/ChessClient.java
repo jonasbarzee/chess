@@ -16,12 +16,12 @@ public class ChessClient {
     private String email;
     private final ServerFacade server;
 
-    public ChessClient(String serverUrl) throws ResponseException {
+    public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
     }
 
     public void run() {
-        System.out.println("Welcome to Jonas' CS 240 Chess Client. Sign or Register to start. Type Help for commands.");
+        System.out.println("Welcome to Jonas' CS 240 Chess Client. Login or Register to start. Type Help for commands.");
         System.out.println(help());
 
         Scanner scanner = new Scanner(System.in);
@@ -31,13 +31,8 @@ public class ChessClient {
             printPrompt();
             String line = scanner.nextLine();
 
-            try {
-                result = evalPreLogin(line);
-                System.out.print(result);
-            } catch (Throwable e) {
-                String message = e.toString();
-                System.out.print(message);
-            }
+            result = evalPreLogin(line);
+            System.out.print(result);
         }
         System.out.println();
     }
@@ -63,8 +58,10 @@ public class ChessClient {
             try {
                 server.register(new RegisterRequest(username, password, email));
             } catch (ResponseException e) {
-                ExceptionHandler.handle(e);
+                return ExceptionHandler.handle(e);
             }
+        } else {
+            return "Expected <USERNAME> <PASSWORD> <EMAIL>";
         }
         return "You are now registered.";
     }
@@ -77,8 +74,10 @@ public class ChessClient {
             try {
                 server.login(new LoginRequest(username, password));
             } catch (ResponseException e) {
-                ExceptionHandler.handle(e);
+                return ExceptionHandler.handle(e);
             }
+        } else {
+            return "Expected <USERNAME> <PASSWORD>";
         }
         return "You are now logged in.";
     }

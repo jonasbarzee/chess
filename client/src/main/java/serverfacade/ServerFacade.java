@@ -87,13 +87,14 @@ public class ServerFacade {
             if (body != null) {
                 throw ResponseException.fromJson(body);
             }
+            System.out.println("here");
             throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
         }
 
         if (responseClass != null) {
             return new Gson().fromJson(response.body(), responseClass);
         }
-
+        System.out.println("returning null");
         return null;
     }
 
