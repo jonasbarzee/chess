@@ -1,9 +1,6 @@
 package client;
 
-import chess.request.CreateGameRequest;
-import chess.request.LoginRequest;
-import chess.request.LogoutRequest;
-import chess.request.RegisterRequest;
+import chess.request.*;
 import chess.result.CreateGameResult;
 import chess.result.LoginResult;
 import chess.result.RegisterResult;
@@ -139,6 +136,26 @@ public class ServerFacadeTests {
             CreateGameRequest createGameRequest1 = new CreateGameRequest("game1", "badToken");
             CreateGameResult createGameResult1 = serverFacade.createGame(createGameRequest1);
             Assertions.assertNull(createGameResult1);
+        });
+    }
+
+    @Test
+    public void joinGameSuccess() {
+        Assertions.assertDoesNotThrow(() -> {
+            RegisterRequest registerRequest = new RegisterRequest("test", "test", "test@test.com");
+            RegisterResult registerResult = serverFacade.register(registerRequest);
+            CreateGameRequest createGameRequest = new CreateGameRequest("myGame", registerResult.authToken());
+            CreateGameResult createGameResult = serverFacade.createGame(createGameRequest);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(registerResult.authToken(), "white", createGameResult.gameID());
+            serverFacade.joinGame(joinGameRequest);
+        });
+    }
+
+    @Test
+    public void joinGameFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> {
+            JoinGameRequest joinGameRequest = new JoinGameRequest("badToken", "white", 1);
+            serverFacade.joinGame(joinGameRequest);
         });
     }
 
