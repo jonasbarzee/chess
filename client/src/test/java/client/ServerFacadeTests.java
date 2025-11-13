@@ -104,8 +104,8 @@ public class ServerFacadeTests {
     public void logoutSuccess() {
         RegisterRequest registerRequest = new RegisterRequest("test", "test", "test@test.com");
         Assertions.assertDoesNotThrow(() -> {
-           RegisterResult registerResult = serverFacade.register(registerRequest);
-           serverFacade.logout(new LogoutRequest(registerResult.authToken()));
+            RegisterResult registerResult = serverFacade.register(registerRequest);
+            serverFacade.logout(new LogoutRequest(registerResult.authToken()));
         });
     }
 
@@ -113,6 +113,32 @@ public class ServerFacadeTests {
     public void logoutFailure() {
         Assertions.assertThrows(ResponseException.class, () -> {
             serverFacade.logout(new LogoutRequest("badToken"));
+        });
+    }
+
+    @Test
+    public void listGamesSuccess() {
+        RegisterRequest registerRequest = new RegisterRequest("test", "test", "test@test.com");
+        Assertions.assertDoesNotThrow(() -> {
+            RegisterResult registerResult = serverFacade.register(registerRequest);
+            CreateGameRequest createGameRequest1 = new CreateGameRequest("game1", registerResult.authToken());
+            CreateGameRequest createGameRequest2 = new CreateGameRequest("game2", registerResult.authToken());
+            CreateGameRequest createGameRequest3 = new CreateGameRequest("game3", registerResult.authToken());
+            CreateGameResult createGameResult1 = serverFacade.createGame(createGameRequest1);
+            CreateGameResult createGameResult2 = serverFacade.createGame(createGameRequest2);
+            CreateGameResult createGameResult3 = serverFacade.createGame(createGameRequest3);
+            Assertions.assertNotNull(createGameResult1);
+            Assertions.assertNotNull(createGameResult2);
+            Assertions.assertNotNull(createGameResult3);
+        });
+    }
+
+    @Test
+    public void listGamesFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> {
+            CreateGameRequest createGameRequest1 = new CreateGameRequest("game1", "badToken");
+            CreateGameResult createGameResult1 = serverFacade.createGame(createGameRequest1);
+            Assertions.assertNull(createGameResult1);
         });
     }
 

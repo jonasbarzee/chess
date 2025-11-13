@@ -1,13 +1,8 @@
 package ui;
 
-import chess.request.CreateGameRequest;
-import chess.request.LoginRequest;
-import chess.request.LogoutRequest;
-import chess.request.RegisterRequest;
-import chess.result.CreateGameResult;
-import chess.result.LoginResult;
-import chess.result.LogoutResult;
-import chess.result.RegisterResult;
+import chess.ChessGame;
+import chess.request.*;
+import chess.result.*;
 import exception.ResponseException;
 import serverfacade.ServerFacade;
 
@@ -23,6 +18,7 @@ public class ChessClient {
     private String gameName;
     private Session session;
     private Integer gameID;
+    private ListGamesResult currentGames;
     private final ServerFacade server;
 
     public ChessClient(String serverUrl) {
@@ -44,6 +40,7 @@ public class ChessClient {
             System.out.print(result);
         }
         System.out.println();
+        session = null;
     }
 
     public String evalPreLogin(String input) {
@@ -56,6 +53,7 @@ public class ChessClient {
                 case "login" -> login(params);
                 case "logout" -> logout();
                 case "create" -> create(params);
+                case "list" -> listGames();
                 case "exit" -> "exit";
                 default -> help();
             };
@@ -125,6 +123,25 @@ public class ChessClient {
             throw new ResponseException(ResponseException.Code.ClientError, "Expected <NAME>");
         }
         return String.format("Created game with id %d", gameID);
+    }
+
+    public String listGames() throws ResponseException {
+        assertLoggedIn();
+        try {
+            currentGames = server.listGames(new ListGamesRequest(session.authToken()));
+        } catch (ResponseException e) {
+            return ExceptionHandler.handle(e);
+        }
+        StringBuilder allGames = new StringBuilder();
+        for (ListGamesResultBuilder game : currentGames.games()) {
+            String gameStr = String.format("Game %s | ID %d | White Player %s | Black Player %s\n",
+                    game.gameName(),
+                    game.gameID(),
+                    game.whiteUsername(),
+                    game.blackUsername());
+                    allGames.append(gameStr);
+        }
+        return (allGames.toString().isEmpty()) ? "No games, try creating one." : allGames.toString();
     }
 
     private void printPrompt() {

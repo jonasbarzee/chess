@@ -39,7 +39,7 @@ public class ServerFacade {
     }
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws ResponseException {
-        HttpRequest request = buildRequest("GET", "/game", listGamesRequest);
+        HttpRequest request = buildRequest("GET", "/game", listGamesRequest, listGamesRequest.authToken());
         HttpResponse<String> response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
