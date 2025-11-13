@@ -33,7 +33,7 @@ public class ServerFacade {
     }
 
     public LogoutResult logout(LogoutRequest logoutRequest) throws ResponseException {
-        HttpRequest request = buildRequest("DELETE", "/session", logoutRequest);
+        HttpRequest request = buildRequest("DELETE", "/session", logoutRequest, logoutRequest.authToken());
         HttpResponse<String> response = sendRequest(request);
         return handleResponse(response, LogoutResult.class);
     }
@@ -45,7 +45,7 @@ public class ServerFacade {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws ResponseException {
-        HttpRequest request = buildRequest("POST", "/game", createGameRequest);
+        HttpRequest request = buildRequest("POST", "/game", createGameRequest, createGameRequest.authToken());
         HttpResponse<String> response = sendRequest(request);
         return handleResponse(response, CreateGameResult.class);
     }
@@ -56,10 +56,18 @@ public class ServerFacade {
         return handleResponse(response, JoinGameResult.class);
     }
 
+    // Overloading buildRequest to take an authToken if needed
     private HttpRequest buildRequest(String method, String path, Object body) {
+       return buildRequest(method, path, body, null);
+    }
+
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         HttpRequest.Builder request = HttpRequest.newBuilder().uri(URI.create(serverUrl + path)).method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.setHeader("authorization", authToken);
         }
         return request.build();
     }
@@ -87,14 +95,12 @@ public class ServerFacade {
             if (body != null) {
                 throw ResponseException.fromJson(body);
             }
-            System.out.println("here");
             throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
         }
 
         if (responseClass != null) {
             return new Gson().fromJson(response.body(), responseClass);
         }
-        System.out.println("returning null");
         return null;
     }
 

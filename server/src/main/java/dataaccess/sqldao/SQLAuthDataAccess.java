@@ -33,6 +33,7 @@ public class SQLAuthDataAccess extends SQLDataAccess implements AuthDataAccess {
 
     public AuthData get(String authToken) throws DataAccessException {
         String statement = "SELECT * FROM auth_data WHERE auth_token = ?;";
+        System.out.println(statement);
         return queryForObject(statement, rs -> new AuthData(rs.getString("username"), rs.getString("auth_token")), authToken);
     }
 

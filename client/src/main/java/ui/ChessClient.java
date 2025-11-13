@@ -1,7 +1,13 @@
 package ui;
 
+import chess.request.CreateGameRequest;
 import chess.request.LoginRequest;
+import chess.request.LogoutRequest;
 import chess.request.RegisterRequest;
+import chess.result.CreateGameResult;
+import chess.result.LoginResult;
+import chess.result.LogoutResult;
+import chess.result.RegisterResult;
 import exception.ResponseException;
 import serverfacade.ServerFacade;
 
@@ -14,6 +20,9 @@ public class ChessClient {
     private String username;
     private String password;
     private String email;
+    private String gameName;
+    private Session session;
+    private Integer gameID;
     private final ServerFacade server;
 
     public ChessClient(String serverUrl) {
@@ -38,48 +47,84 @@ public class ChessClient {
     }
 
     public String evalPreLogin(String input) {
-        String[] tokens = input.toLowerCase().split(" ");
-        String cmd = (tokens.length > 0) ? tokens[0] : "help";
-        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (cmd) {
-            case "register" -> register(params);
-            case "login" -> login(params);
-            case "exit" -> "exit";
-            default -> help();
-        };
+        try {
+            String[] tokens = input.toLowerCase().split(" ");
+            String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+            return switch (cmd) {
+                case "register" -> register(params);
+                case "login" -> login(params);
+                case "logout" -> logout();
+                case "create" -> create(params);
+                case "exit" -> "exit";
+                default -> help();
+            };
+        } catch (ResponseException e) {
+            return e.getMessage();
+        }
     }
 
-    public String register(String... params) {
+    public String register(String... params) throws ResponseException {
         if (params.length == 3) {
-            state = State.LOGGEDOUT;
             username = params[0];
             password = params[1];
             email = params[2];
             try {
-                server.register(new RegisterRequest(username, password, email));
+                RegisterResult registerResult = server.register(new RegisterRequest(username, password, email));
+                session = new Session(registerResult.username(), registerResult.authToken());
+                state = State.LOGGEDIN;
             } catch (ResponseException e) {
                 return ExceptionHandler.handle(e);
             }
         } else {
-            return "Expected <USERNAME> <PASSWORD> <EMAIL>";
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <USERNAME> <PASSWORD> <EMAIL>");
         }
         return "You are now registered.";
     }
 
-    public String login(String... params) {
+    public String login(String... params) throws ResponseException {
         if (params.length == 2) {
-            state = State.LOGGEDIN;
             username = params[0];
             password = params[1];
             try {
-                server.login(new LoginRequest(username, password));
+                LoginResult loginResult = server.login(new LoginRequest(username, password));
+                session = new Session(loginResult.username(), loginResult.authToken());
+                state = State.LOGGEDIN;
             } catch (ResponseException e) {
                 return ExceptionHandler.handle(e);
             }
         } else {
-            return "Expected <USERNAME> <PASSWORD>";
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <USERNAME> <PASSWORD>");
         }
         return "You are now logged in.";
+    }
+
+    public String logout() throws ResponseException {
+       assertLoggedIn();
+       try {
+           server.logout(new LogoutRequest(session.authToken()));
+           session = null;
+           state = State.LOGGEDOUT;
+       } catch (ResponseException e) {
+           return ExceptionHandler.handle(e);
+       }
+       return "You are now logged out.";
+    }
+
+    public String create(String... params) throws ResponseException {
+        assertLoggedIn();
+        if (params.length == 1) {
+            gameName = params[0];
+            try {
+                CreateGameResult createGameResult = server.createGame(new CreateGameRequest(gameName, session.authToken()));
+                gameID = createGameResult.gameID();
+            } catch (ResponseException e) {
+                return ExceptionHandler.handle(e);
+            }
+        } else {
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <NAME>");
+        }
+        return String.format("Created game with id %d", gameID);
     }
 
     private void printPrompt() {
@@ -121,7 +166,7 @@ public class ChessClient {
     }
 
     private void assertLoggedIn() throws ResponseException {
-        if (state == State.LOGGEDOUT) {
+        if (state == State.LOGGEDOUT || session == null) {
             throw new ResponseException(ResponseException.Code.ClientError, "You must log in");
         }
     }
