@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.request.*;
 import chess.result.*;
@@ -14,11 +15,7 @@ public class ChessClient {
     private State state = State.LOGGEDOUT;
     private String username;
     private String password;
-    private String email;
-    private String gameName;
     private Session session;
-    private Integer gameID;
-    private ListGamesResult currentGames;
     private final ServerFacade server;
 
     public ChessClient(String serverUrl) {
@@ -51,8 +48,9 @@ public class ChessClient {
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
-                case "logout" -> logout();
                 case "create" -> create(params);
+                case "join" -> joinGame(params);
+                case "logout" -> logout();
                 case "list" -> listGames();
                 case "exit" -> "exit";
                 default -> help();
@@ -66,7 +64,7 @@ public class ChessClient {
         if (params.length == 3) {
             username = params[0];
             password = params[1];
-            email = params[2];
+            String email = params[2];
             try {
                 RegisterResult registerResult = server.register(new RegisterRequest(username, password, email));
                 session = new Session(registerResult.username(), registerResult.authToken());
@@ -98,35 +96,36 @@ public class ChessClient {
     }
 
     public String logout() throws ResponseException {
-       assertLoggedIn();
-       try {
-           server.logout(new LogoutRequest(session.authToken()));
-           session = null;
-           state = State.LOGGEDOUT;
-       } catch (ResponseException e) {
-           return ExceptionHandler.handle(e);
-       }
-       return "You are now logged out.";
+        assertLoggedIn();
+        try {
+            server.logout(new LogoutRequest(session.authToken()));
+            session = null;
+            state = State.LOGGEDOUT;
+        } catch (ResponseException e) {
+            return ExceptionHandler.handle(e);
+        }
+        return "You are now logged out.";
     }
 
     public String create(String... params) throws ResponseException {
         assertLoggedIn();
+        CreateGameResult createGameResult;
         if (params.length == 1) {
-            gameName = params[0];
+            String gameName = params[0];
             try {
-                CreateGameResult createGameResult = server.createGame(new CreateGameRequest(gameName, session.authToken()));
-                gameID = createGameResult.gameID();
+                createGameResult = server.createGame(new CreateGameRequest(gameName, session.authToken()));
             } catch (ResponseException e) {
                 return ExceptionHandler.handle(e);
             }
         } else {
             throw new ResponseException(ResponseException.Code.ClientError, "Expected <NAME>");
         }
-        return String.format("Created game with id %d", gameID);
+        return String.format("Created game with id %s", createGameResult.gameID());
     }
 
     public String listGames() throws ResponseException {
         assertLoggedIn();
+        ListGamesResult currentGames;
         try {
             currentGames = server.listGames(new ListGamesRequest(session.authToken()));
         } catch (ResponseException e) {
@@ -139,9 +138,41 @@ public class ChessClient {
                     game.gameID(),
                     game.whiteUsername(),
                     game.blackUsername());
-                    allGames.append(gameStr);
+            allGames.append(gameStr);
         }
         return (allGames.toString().isEmpty()) ? "No games, try creating one." : allGames.toString();
+    }
+
+    public String joinGame(String... params) throws ResponseException {
+        assertLoggedIn();
+        String gameID;
+        String playerColor;
+
+        if (params.length == 2) {
+            gameID = params[0];
+            playerColor = params[1].toLowerCase();
+            Integer gameIdInt = parseGameId(gameID);
+
+            try {
+                JoinGameResult joinGameResult = server.joinGame(new JoinGameRequest(session.authToken(), playerColor, gameIdInt));
+            } catch (ResponseException e) {
+                return ExceptionHandler.handle(e);
+            }
+        } else {
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <ID> [WHITE | BLACK]");
+        }
+        ChessBoard chessBoard = new ChessBoard();
+        chessBoard.resetBoard();
+        BoardPrinter.printBoard(chessBoard, playerColor.equals("white"));
+        return String.format("Joined game with id %s", gameID);
+    }
+
+    private Integer parseGameId(String string) throws ResponseException {
+        try {
+            return Integer.parseInt(string);
+        } catch (NumberFormatException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: must be an integer.");
+        }
     }
 
     private void printPrompt() {
