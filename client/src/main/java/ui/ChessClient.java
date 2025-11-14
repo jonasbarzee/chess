@@ -1,7 +1,6 @@
 package ui;
 
 import chess.ChessBoard;
-import chess.ChessGame;
 import chess.request.*;
 import chess.result.*;
 import exception.ResponseException;

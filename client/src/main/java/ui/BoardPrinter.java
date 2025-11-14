@@ -1,54 +1,78 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
 public class BoardPrinter {
 
-    private static void printBoardHeader(boolean isWhitePerspective) {
-        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-        System.out.println(isWhitePerspective ? "    a  b  c  d  e  f  g  h" : "    h  g  f  e  d  c  b  a");
+    private static final String whitePieceColor = EscapeSequences.SET_TEXT_COLOR_RED;
+    private static final String blackPieceColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
+    private static final String textBold = EscapeSequences.SET_TEXT_BOLD;
+    private static final String resetTextBold = EscapeSequences.RESET_TEXT_BOLD_FAINT;
+    private static final String whiteText = EscapeSequences.SET_TEXT_COLOR_WHITE;
+    private static final String resetText = EscapeSequences.RESET_TEXT_COLOR;
+    private static final String darkBack = EscapeSequences.SET_BG_COLOR_BLACK;
+    private static final String lightBack = EscapeSequences.SET_BG_COLOR_WHITE;
+    private static final String resetBack = EscapeSequences.RESET_BG_COLOR;
 
-    }
+    public static void printBoard(ChessBoard board, boolean white) {
+        printBoardHeader(white);
 
-    private static void printBoardFooter(boolean isWhitePerspective) {
-        System.out.println(isWhitePerspective ? "    a  b  c  d  e  f  g  h" : "    h  g  f  e  d  c  b  a");
-        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
-        System.out.print(EscapeSequences.RESET_BG_COLOR);
-    }
+        for (int dr = 0; dr < 8; dr++) {
+            int row = mapRow(dr, white);
 
-    private static void printBoardHelper(ChessBoard board, int row, boolean isWhitePerspective) {
-        for (int col = 1; col <= 8; col++) {
-            ChessPosition pos = new ChessPosition(row, col);
-            ChessPiece piece = board.getPiece(pos);
+            System.out.print(whiteText + " " + row + " ");
 
-            boolean dark = isWhitePerspective ? (row + col) % 2 == 0 : (row + col + 1) % 2 == 0;
-            String background = dark ? EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-            if (piece == null) {
-                System.out.print(background + "   " + EscapeSequences.SET_BG_COLOR_BLACK);
-            } else if (!isWhitePerspective) {
-                if (piece.toLetter().equals("K")) {
-                    System.out.print(background + " " + "Q" + " " + EscapeSequences.SET_BG_COLOR_BLACK);
-                } else if (piece.toLetter().equals("Q")) {
-                    System.out.print(background + " " + "K" + " " + EscapeSequences.SET_BG_COLOR_BLACK);
-                } else {
-                    System.out.print(background + " " + piece.toLetter() + " " + EscapeSequences.SET_BG_COLOR_BLACK);
-                }
+            for (int dc = 0; dc < 8; dc++) {
+                int col = mapCol(dc, white);
 
-            } else {
-                System.out.print(background + " " + piece.toLetter() + " " + EscapeSequences.SET_BG_COLOR_BLACK);
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                boolean darkSquare = (row + col) % 2 == 0;
+
+                printSquare(piece, darkSquare);
             }
+            System.out.println(" " + row);
         }
+        printBoardFooter(white);
     }
-    public static void printBoard(ChessBoard board, boolean isWhitePerspective) {
-        printBoardHeader(isWhitePerspective);
-        for (int row = isWhitePerspective ? 8 : 1; isWhitePerspective ? row >= 1 : row <= 8; row += isWhitePerspective ? -1 : 1) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + " " + row + " ");
-            printBoardHelper(board, row, isWhitePerspective);
-            System.out.print(" " + row);
-            System.out.println();
+
+    private static void printBoardHeader(boolean white) {
+        System.out.println(white ? whiteText + "    a  b  c  d  e  f  g  h" : whiteText + "    h  g  f  e  d  c  b  a");
+
+    }
+
+    private static void printBoardFooter(boolean white) {
+        System.out.println(white ? whiteText + "    a  b  c  d  e  f  g  h" : whiteText + "    h  g  f  e  d  c  b  a");
+    }
+
+    private static int mapRow(int displayRow, boolean white) {
+        return white ? 8 - displayRow : 1 + displayRow;
+    }
+
+    private static int mapCol(int displayCol, boolean white) {
+        return white ? 1 + displayCol : 8 - displayCol;
+    }
+
+    private static String renderPiece(ChessPiece piece) {
+        if (piece == null) {
+            return " ";
         }
-        printBoardFooter(isWhitePerspective);
+        return piece.toLetter();
+    }
+
+    private static String renderColor(ChessPiece piece) {
+        if (piece == null) {
+            return resetText;
+        }
+        return piece.getTeamColor() == ChessGame.TeamColor.WHITE ? whitePieceColor : blackPieceColor;
+    }
+
+    private static void printSquare(ChessPiece piece, boolean isDark) {
+        String bg = isDark ? darkBack : lightBack;
+        String content = renderPiece(piece);
+        String color = renderColor(piece);
+        System.out.print(color + bg + textBold + " " + content + " " + resetBack + resetText + resetTextBold);
     }
 }

@@ -158,5 +158,4 @@ public class ServerFacadeTests {
             serverFacade.joinGame(joinGameRequest);
         });
     }
-
 }
