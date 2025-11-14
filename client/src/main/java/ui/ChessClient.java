@@ -4,7 +4,10 @@ import chess.ChessBoard;
 import chess.request.*;
 import chess.result.*;
 import exception.ResponseException;
+import gamecatalog.GameCatalog;
+import model.Session;
 import serverfacade.ServerFacade;
+
 import java.util.*;
 
 public class ChessClient {
@@ -13,7 +16,7 @@ public class ChessClient {
     private String username;
     private String password;
     private Session session;
-    private final HashSet<Integer> validGames = new HashSet<>();
+    private final GameCatalog gameCatalog = new GameCatalog();
     private final ServerFacade server;
 
     public ChessClient(String serverUrl) {
@@ -108,19 +111,18 @@ public class ChessClient {
 
     public String create(String... params) throws ResponseException {
         assertLoggedIn();
-        CreateGameResult createGameResult;
-        if (params.length == 1) {
-            String gameName = params[0];
-            try {
-                createGameResult = server.createGame(new CreateGameRequest(gameName, session.authToken()));
-                validGames.add(createGameResult.gameID());
-            } catch (ResponseException e) {
-                return ExceptionHandler.handle(e);
-            }
-        } else {
+        if (params.length != 1) {
             throw new ResponseException(ResponseException.Code.ClientError, "Expected <NAME>");
         }
-        return String.format("Created game with id %s", createGameResult.gameID());
+
+        String gameName = params[0];
+        try {
+            server.createGame(new CreateGameRequest(gameName, session.authToken()));
+        } catch (ResponseException e) {
+            return ExceptionHandler.handle(e);
+        }
+
+        return "Created game.";
     }
 
     public String listGames() throws ResponseException {
@@ -132,63 +134,65 @@ public class ChessClient {
             return ExceptionHandler.handle(e);
         }
         StringBuilder allGames = new StringBuilder();
-        for (ListGamesResultBuilder game : currentGames.games()) {
+        gameCatalog.updateGameCatalog(currentGames);
+        Collection<ListGamesResultBuilder> games = gameCatalog.getGames();
+        for (ListGamesResultBuilder game : games) {
             String gameStr = String.format("Game %s | ID %d | White Player %s | Black Player %s\n",
                     game.gameName(),
-                    game.gameID(),
+                    gameCatalog.getClientIdFromServerId(game.gameID()),
                     game.whiteUsername(),
                     game.blackUsername());
             allGames.append(gameStr);
-            validGames.add(game.gameID());
         }
         return (allGames.toString().isEmpty()) ? "No games, try creating one." : allGames.toString();
     }
 
     public String joinGame(String... params) throws ResponseException {
         assertLoggedIn();
-        String gameID;
-        String playerColor;
-
-        if (params.length == 2) {
-            gameID = params[0];
-            playerColor = params[1].toLowerCase();
-            Integer gameIdInt = parseGameId(gameID);
-
-            if (!validGames.contains(gameIdInt)) {
-                throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: not a valid game.");
-            }
-
-            try {
-                JoinGameResult joinGameResult = server.joinGame(new JoinGameRequest(session.authToken(), playerColor, gameIdInt));
-            } catch (ResponseException e) {
-                return ExceptionHandler.handle(e);
-            }
-
-        } else {
+        if (params.length != 2) {
             throw new ResponseException(ResponseException.Code.ClientError, "Expected <ID> [WHITE | BLACK]");
         }
+
+        String gameId = params[0];
+        String playerColor = params[1].toLowerCase();
+        Integer gameIdInt = parseGameId(gameId);
+
+        Integer serverId = gameCatalog.getServerIdFromClientId(gameIdInt);
+        if (serverId == null) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: not a valid game.");
+        }
+
+        try {
+            JoinGameResult joinGameResult = server.joinGame(new JoinGameRequest(session.authToken(), playerColor, serverId));
+        } catch (ResponseException e) {
+            return ExceptionHandler.handle(e);
+        }
+
         ChessBoard chessBoard = new ChessBoard();
         chessBoard.resetBoard();
         BoardPrinter.printBoard(chessBoard, playerColor.equals("white"));
-        return String.format("Joined game with id %s", gameID);
+        return String.format("Joined game with id %s", gameIdInt);
     }
 
     public String observeGame(String... params) throws ResponseException {
-       assertLoggedIn();
-       Integer gameID;
+        assertLoggedIn();
+        if (params.length != 1) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <ID>");
+        }
 
-       if (params.length == 1) {
-           gameID = parseGameId(params[0]);
-           if (validGames.contains(gameID)) {
-               ChessBoard chessBoard = new ChessBoard();
-               chessBoard.resetBoard();
-               BoardPrinter.printBoard(chessBoard, true);
-               return String.format("Observing game with id %d", gameID);
-           }
-           throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: not a valid game.");
-       }
-       throw new ResponseException(ResponseException.Code.ClientError, "Expected <ID>");
+        Integer gameId = parseGameId(params[0]);
+        Integer serverIdFromClientId = gameCatalog.getServerIdFromClientId(gameId);
+
+        if (serverIdFromClientId == null) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: not a valid game.");
+        }
+
+        ChessBoard chessBoard = new ChessBoard();
+        chessBoard.resetBoard();
+        BoardPrinter.printBoard(chessBoard, true);
+        return String.format("Observing game with id %d", gameId);
     }
+
 
     private Integer parseGameId(String string) throws ResponseException {
         try {
