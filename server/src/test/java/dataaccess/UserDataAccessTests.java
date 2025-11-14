@@ -4,7 +4,7 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.sqldao.DatabaseManager;
 import dataaccess.sqldao.SQLDataAccess;
 import dataaccess.sqldao.SQLUserDataAccess;
-import model.UserData;
+import dataaccess.model.UserData;
 import org.junit.jupiter.api.*;
 
 public class UserDataAccessTests {

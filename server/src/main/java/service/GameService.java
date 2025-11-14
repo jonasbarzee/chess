@@ -11,7 +11,7 @@ import chess.result.ListGamesResultBuilder;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
 import dataaccess.exceptions.DataAccessException;
-import model.GameData;
+import dataaccess.model.GameData;
 
 import java.util.ArrayList;
 import java.util.Collection;

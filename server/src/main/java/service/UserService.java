@@ -9,8 +9,8 @@ import chess.result.RegisterResult;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.UserDataAccess;
 import dataaccess.exceptions.DataAccessException;
-import model.AuthData;
-import model.UserData;
+import dataaccess.model.AuthData;
+import dataaccess.model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;

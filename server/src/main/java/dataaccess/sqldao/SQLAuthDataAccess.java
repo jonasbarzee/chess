@@ -4,7 +4,7 @@ package dataaccess.sqldao;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataNotFoundException;
 import dataaccess.interfaces.AuthDataAccess;
-import model.AuthData;
+import dataaccess.model.AuthData;
 
 import java.util.UUID;
 

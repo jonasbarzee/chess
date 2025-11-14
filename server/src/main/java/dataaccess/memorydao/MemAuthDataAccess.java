@@ -2,7 +2,7 @@ package dataaccess.memorydao;
 
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.AuthDataAccess;
-import model.AuthData;
+import dataaccess.model.AuthData;
 
 import java.util.*;
 

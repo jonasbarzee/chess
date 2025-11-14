@@ -1,7 +1,7 @@
 package dataaccess.interfaces;
 
 import dataaccess.exceptions.DataAccessException;
-import model.UserData;
+import dataaccess.model.UserData;
 
 public interface UserDataAccess {
     public void createUser(UserData userData) throws DataAccessException;

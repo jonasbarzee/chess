@@ -4,7 +4,7 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.sqldao.DatabaseManager;
 import dataaccess.sqldao.SQLAuthDataAccess;
 import dataaccess.sqldao.SQLDataAccess;
-import model.AuthData;
+import dataaccess.model.AuthData;
 import org.junit.jupiter.api.*;
 
 public class AuthDataAccessTests {

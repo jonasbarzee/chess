@@ -4,7 +4,7 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataNotFoundException;
 import dataaccess.exceptions.DuplicateKeyException;
 import dataaccess.interfaces.UserDataAccess;
-import model.UserData;
+import dataaccess.model.UserData;
 
 import java.util.HashMap;
 import java.util.Map;

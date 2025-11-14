@@ -2,7 +2,7 @@ package dataaccess.sqldao;
 
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.UserDataAccess;
-import model.UserData;
+import dataaccess.model.UserData;
 
 public class SQLUserDataAccess extends SQLDataAccess implements UserDataAccess {
     public SQLUserDataAccess() {

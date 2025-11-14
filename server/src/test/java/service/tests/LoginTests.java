@@ -8,7 +8,7 @@ import chess.result.LogoutResult;
 import chess.result.RegisterResult;
 import dataaccess.memorydao.MemAuthDataAccess;
 import dataaccess.memorydao.MemUserDataAccess;
-import model.UserData;
+import dataaccess.model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

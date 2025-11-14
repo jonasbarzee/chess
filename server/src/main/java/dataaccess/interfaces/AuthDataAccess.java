@@ -1,7 +1,7 @@
 package dataaccess.interfaces;
 
 import dataaccess.exceptions.DataAccessException;
-import model.AuthData;
+import dataaccess.model.AuthData;
 
 public interface AuthDataAccess {
     public void deleteAllAuthData() throws DataAccessException;

@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.GameDataAccess;
-import model.GameData;
+import dataaccess.model.GameData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
