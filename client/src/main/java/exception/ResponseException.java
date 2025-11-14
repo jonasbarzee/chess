@@ -29,8 +29,6 @@ public class ResponseException extends Exception {
     }
 
     public static ResponseException fromJson(String json) {
-        System.out.println("In fromJson");
-        System.out.println(json);
 
         try {
             HashMap<String, Object> map = new Gson().fromJson(json, HashMap.class);
@@ -48,16 +46,11 @@ public class ResponseException extends Exception {
             Code status;
             try {
                 status = Code.valueOf(map.get("status").toString());
-                System.out.println(status);
             } catch (IllegalArgumentException e) {
-                System.out.println("Caught illegal argument exception");
                 status = Code.ServerError;
             }
 
             String message = (messageObj != null) ? messageObj.toString() : "Unknown server error";
-            System.out.println("returning new response exception");
-            System.out.println(status);
-            System.out.println(message);
             return new ResponseException(status, message);
         } catch (Exception e) {
             return new ResponseException(Code.ServerError, "Malformed server response.");
