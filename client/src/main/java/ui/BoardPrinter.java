@@ -7,15 +7,15 @@ import chess.ChessPosition;
 
 public class BoardPrinter {
 
-    private static final String whitePieceColor = EscapeSequences.SET_TEXT_COLOR_RED;
-    private static final String blackPieceColor = EscapeSequences.SET_TEXT_COLOR_BLUE;
-    private static final String textBold = EscapeSequences.SET_TEXT_BOLD;
-    private static final String resetTextBold = EscapeSequences.RESET_TEXT_BOLD_FAINT;
-    private static final String whiteText = EscapeSequences.SET_TEXT_COLOR_WHITE;
-    private static final String resetText = EscapeSequences.RESET_TEXT_COLOR;
-    private static final String darkBack = EscapeSequences.SET_BG_COLOR_BLACK;
-    private static final String lightBack = EscapeSequences.SET_BG_COLOR_WHITE;
-    private static final String resetBack = EscapeSequences.RESET_BG_COLOR;
+    private static final String WHITE_PIECE_COLOR = EscapeSequences.SET_TEXT_COLOR_RED;
+    private static final String BLACK_PIECE_COLOR = EscapeSequences.SET_TEXT_COLOR_BLUE;
+    private static final String TEXT_BOLD = EscapeSequences.SET_TEXT_BOLD;
+    private static final String RESET_TEXT_BOLD = EscapeSequences.RESET_TEXT_BOLD_FAINT;
+    private static final String WHITE_TEXT = EscapeSequences.SET_TEXT_COLOR_WHITE;
+    private static final String RESET_TEXT = EscapeSequences.RESET_TEXT_COLOR;
+    private static final String DARK_BACK = EscapeSequences.SET_BG_COLOR_BLACK;
+    private static final String LIGHT_BACK = EscapeSequences.SET_BG_COLOR_WHITE;
+    private static final String RESET_BACK = EscapeSequences.RESET_BG_COLOR;
 
     public static void printBoard(ChessBoard board, boolean white) {
         printBoardHeader(white);
@@ -23,7 +23,7 @@ public class BoardPrinter {
         for (int dr = 0; dr < 8; dr++) {
             int row = mapRow(dr, white);
 
-            System.out.print(whiteText + " " + row + " ");
+            System.out.print(WHITE_TEXT + " " + row + " ");
 
             for (int dc = 0; dc < 8; dc++) {
                 int col = mapCol(dc, white);
@@ -39,12 +39,12 @@ public class BoardPrinter {
     }
 
     private static void printBoardHeader(boolean white) {
-        System.out.println(white ? whiteText + "    a  b  c  d  e  f  g  h" : whiteText + "    h  g  f  e  d  c  b  a");
+        System.out.println(white ? WHITE_TEXT + "    a  b  c  d  e  f  g  h" : WHITE_TEXT + "    h  g  f  e  d  c  b  a");
 
     }
 
     private static void printBoardFooter(boolean white) {
-        System.out.println(white ? whiteText + "    a  b  c  d  e  f  g  h" : whiteText + "    h  g  f  e  d  c  b  a");
+        System.out.println(white ? WHITE_TEXT + "    a  b  c  d  e  f  g  h" : WHITE_TEXT + "    h  g  f  e  d  c  b  a");
     }
 
     private static int mapRow(int displayRow, boolean white) {
@@ -64,15 +64,15 @@ public class BoardPrinter {
 
     private static String renderColor(ChessPiece piece) {
         if (piece == null) {
-            return resetText;
+            return RESET_TEXT;
         }
-        return piece.getTeamColor() == ChessGame.TeamColor.WHITE ? whitePieceColor : blackPieceColor;
+        return piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_PIECE_COLOR : BLACK_PIECE_COLOR;
     }
 
     private static void printSquare(ChessPiece piece, boolean isDark) {
-        String bg = isDark ? darkBack : lightBack;
+        String bg = isDark ? DARK_BACK : LIGHT_BACK;
         String content = renderPiece(piece);
         String color = renderColor(piece);
-        System.out.print(color + bg + textBold + " " + content + " " + resetBack + resetText + resetTextBold);
+        System.out.print(color + bg + TEXT_BOLD + " " + content + " " + RESET_BACK + RESET_TEXT + RESET_TEXT_BOLD);
     }
 }
