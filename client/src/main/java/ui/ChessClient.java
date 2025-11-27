@@ -7,10 +7,12 @@ import exception.ResponseException;
 import gamecatalog.GameCatalog;
 import model.Session;
 import serverfacade.ServerFacade;
+import websocket.ServerMessageHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.*;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageHandler  {
 
     private State state = State.LOGGEDOUT;
     private String username;
@@ -21,6 +23,10 @@ public class ChessClient {
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
+    }
+
+    public void notify(ServerMessage serverMessage) {
+        System.out.println(serverMessage.toString());
     }
 
     public void run() {
