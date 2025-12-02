@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 
 public class WebSocketClient extends Endpoint {
 
-    Session session;            ;
+    Session session;
     ServerMessageHandler serverMessageHandler;
     private static final Gson gson = new Gson();
 
@@ -38,7 +38,9 @@ public class WebSocketClient extends Endpoint {
 
     public void send(String json) throws ResponseException {
         try {
-            session.getBasicRemote().sendText(json);
+            if (session.isOpen()) {
+                session.getBasicRemote().sendText(json);
+            }
         } catch (IOException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
@@ -46,6 +48,7 @@ public class WebSocketClient extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        this.session = session;
     }
 
 // do I need these overridden methods?

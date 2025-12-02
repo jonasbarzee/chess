@@ -8,10 +8,12 @@ import io.javalin.json.JavalinGson;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
+import websocket.WebsocketHandler;
 
 public class Server {
 
     private final Javalin javalin;
+    private final WebsocketHandler websocketHandler;
 
     public Server() {
         javalin = Javalin.create(config -> {
@@ -45,6 +47,14 @@ public class Server {
         javalin.get("/game", new ListGamesHandler(gameService, errorHandler));
         javalin.post("/game", new CreateGameHandler(gameService, errorHandler));
         javalin.put("/game", new JoinGameHandler(gameService, errorHandler));
+
+        this.websocketHandler = new WebsocketHandler();
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(websocketHandler);
+            ws.onClose(websocketHandler);
+            ws.onMessage(websocketHandler);
+//            ws.onError();
+        } );
     }
 
     public int run(int desiredPort) {
