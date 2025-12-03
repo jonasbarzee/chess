@@ -17,28 +17,24 @@ public class WebSocketClient extends Endpoint {
 
     public WebSocketClient(String url, ServerMessageHandler serverMessageHandler) throws ResponseException {
         try {
-            url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/ws");
             this.serverMessageHandler = serverMessageHandler;
 
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
+            url = url.replace("http", "ws");
+            URI socketURI = new URI(url + "/ws");
 
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-                    serverMessageHandler.notify(serverMessage);
-                }
-            });
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            ClientEndpointConfig config = ClientEndpointConfig.Builder.create().build();
+            container.connectToServer(this, config, socketURI);
+
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+            }
         }
-    }
+
 
     public void send(String json) throws ResponseException {
         try {
-            if (session.isOpen()) {
+            if (session != null && session.isOpen()) {
                 session.getBasicRemote().sendText(json);
             }
         } catch (IOException ex) {
@@ -48,7 +44,17 @@ public class WebSocketClient extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+        System.out.println("In onOpen");
         this.session = session;
+
+        session.addMessageHandler(new MessageHandler.Whole<String>() {
+            @Override
+            public void onMessage(String message) {
+                ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                serverMessageHandler.notify(serverMessage);
+            }
+        });
+        System.out.println("Connected message handler");
     }
 
 // do I need these overridden methods?

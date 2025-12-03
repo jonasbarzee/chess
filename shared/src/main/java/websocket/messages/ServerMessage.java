@@ -12,7 +12,6 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
-    Gson gson = new Gson();
 
     public enum ServerMessageType {
         LOAD_GAME,

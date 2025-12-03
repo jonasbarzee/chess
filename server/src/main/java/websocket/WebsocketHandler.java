@@ -26,40 +26,64 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(WsConnectContext context) {
-        String token = context.queryParam("authToken");
-        int gameId = Integer.parseInt(context.queryParam("gameId"));
+        // temp debugging
+        System.out.println("context object " + context);
+        System.out.println("Query parameters " + context.queryParamMap());
+        System.out.println("URL " + context.getUpgradeCtx$javalin().fullUrl());
+        System.out.println("Session " + context.session);
 
-        List<ServerMessage> messages = gameWebSocketService.handleConnect(context.session, token, gameId);
+        System.out.println("Opening");
 
-        for (ServerMessage message : messages) {
-            context.send(gson.toJson(message));
-        }
+        wsConnectionManager.register(context.session);
+
+//
+//        String token = context.queryParam("authToken");
+//        int gameId = Integer.parseInt(context.queryParam("gameId"));
+//
+//        List<ServerMessage> messages = gameWebSocketService.handleJoin(context.session, token, gameId);
+//
+//        for (ServerMessage message : messages) {
+//            context.send(gson.toJson(message));
+//        }
     }
 
     @Override
     public void handleMessage(WsMessageContext context) {
+        System.out.println("Handling message");
         try {
             UserGameCommand userGameCommand = new Gson().fromJson(context.message(), UserGameCommand.class);
+            System.out.println(userGameCommand.getCommandType());
+            System.out.println(userGameCommand.getGameID());
+            System.out.println(userGameCommand.getAuthToken());
 
             List<ServerMessage> outgoingMessages = switch (userGameCommand.getCommandType()) {
-                case CONNECT -> gameWebSocketService.handleConnect(context.session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
+                case CONNECT -> gameWebSocketService.handleJoin(context.session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
                 case MAKE_MOVE -> gameWebSocketService.handleMove(userGameCommand, context.session);
                 case RESIGN -> gameWebSocketService.handleResign(userGameCommand, context.session);
                 case LEAVE -> gameWebSocketService.handleLeave(userGameCommand, context.session);
             };
 
             for (ServerMessage message : outgoingMessages) {
-                wsConnectionManager.broadcastMessage(userGameCommand.getGameID().toString(), context.session, message);
+                if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                    wsConnectionManager.broadcastMessageToAll(userGameCommand.getGameID(), message);
+                }
+                else {
+                    wsConnectionManager.broadcastMessage(userGameCommand.getGameID(), context.session, message);
+                }
             }
         } catch (Exception ex) {
+            System.out.println("Error!!");
+            System.out.println(ex.getMessage());
             context.send(gson.toJson(ServerMessage.ServerMessageType.ERROR));
         }
     }
 
     @Override
     public void handleClose(WsCloseContext context) {
-        String gameId = context.queryParam("gameId");
-        wsConnectionManager.remove(gameId, context.session);
+        System.out.println("Closing");
+//        String gameId = context.queryParam("gameId");
+//        int gameIdInteger = Integer.parseInt(gameId);
+        wsConnectionManager.remove(context.session);
     }
 
     // implement the methods here like make_move, leave, resign, connect
