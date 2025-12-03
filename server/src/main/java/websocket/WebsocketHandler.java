@@ -1,14 +1,17 @@
 package websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
 import dataaccess.sqldao.SQLAuthDataAccess;
 import dataaccess.sqldao.SQLGameDataAccess;
 import io.javalin.websocket.*;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.List;
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -65,16 +68,21 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             for (ServerMessage message : outgoingMessages) {
                 if (message.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                    wsConnectionManager.broadcastMessageToAll(userGameCommand.getGameID(), message);
-                }
-                else {
+                    context.session.getRemote().sendString(gson.toJson(message));
+                } else {
                     wsConnectionManager.broadcastMessage(userGameCommand.getGameID(), context.session, message);
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Error!!");
-            System.out.println(ex.getMessage());
-            context.send(gson.toJson(ServerMessage.ServerMessageType.ERROR));
+            System.out.println("WebSocket error: " + ex.getMessage());
+
+            ServerMessage errorMessage = new ErrorMessage(ex.getMessage());
+            System.out.println(gson.toJson(errorMessage));
+            try {
+                context.session.getRemote().sendString(gson.toJson(errorMessage));
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 

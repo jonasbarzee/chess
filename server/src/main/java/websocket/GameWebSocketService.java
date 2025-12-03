@@ -5,6 +5,7 @@ import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
 import dataaccess.model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
+import org.junit.jupiter.api.Assertions;
 import server.Server;
 import service.BadRequestException;
 import service.ChessServerException;
@@ -12,6 +13,7 @@ import service.InternalServerException;
 import service.UnauthorizedException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.List;
@@ -39,10 +41,12 @@ public class GameWebSocketService {
                 throw new BadRequestException("Bad Request, game DNE");
             }
 
+            String username = authDataAccess.getUsername(token);
+            String color = gameData.whiteUsername().isEmpty() ? "white" : "black";
             websocketConnectionManager.add(gameId, session);
 
             ServerMessage loadGameMessage = new LoadGameMessage(gameData.game());
-            ServerMessage notificationMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            ServerMessage notificationMessage = new NotificationMessage("Player " + username + " joined as " + color);
             System.out.println(loadGameMessage);
             System.out.println(notificationMessage);
             return List.of(loadGameMessage, notificationMessage);
