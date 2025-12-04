@@ -13,10 +13,12 @@ import service.InternalServerException;
 import service.UnauthorizedException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,30 +62,72 @@ public class GameWebSocketService {
 
     public List<ServerMessage> handleMove(MakeMoveCommand makeMoveCommand, Session session, int gameId) throws ChessServerException {
         try {
-            System.out.println(makeMoveCommand.getMove());
+            System.out.println("Move: " + makeMoveCommand.getMove());
             ChessMove move = makeMoveCommand.getMove();
             GameData gameData = gameDataAccess.getGame(gameId);
             ChessGame game = gameData.game();
             Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
 
-            if (validMoves.contains(move)) {
-               game.makeMove(move);
-               gameDataAccess.updateGameData(gameData);
+            if (game.getIsGameOver()) {
+                System.out.println("Can't make move, game is over");
+                LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+                ErrorMessage errorMessage = new ErrorMessage("No moves can be made, game is over.");
+                return List.of(loadGameMessage, errorMessage);
             }
 
-            // check write here
+            if (!validMoves.contains(move)) {
+                System.out.println("Can't make move, not a valid move");
+                return List.of(new ErrorMessage("Error: Not a valid move."));
+            }
+            game.makeMove(move);
 
-            ServerMessage loadGameMessage = new LoadGameMessage(gameData.game());
-            ServerMessage notificationMessage = new NotificationMessage("Player made move " + move);
-            return List.of(loadGameMessage, notificationMessage);
+            boolean checkmate = game.isInCheckmate(ChessGame.TeamColor.WHITE) || game.isInCheckmate(ChessGame.TeamColor.BLACK);
+            boolean stalemate = game.isInStalemate(ChessGame.TeamColor.WHITE) || game.isInStalemate(ChessGame.TeamColor.BLACK);
+            boolean check = game.isInCheck(ChessGame.TeamColor.WHITE) || game.isInCheck(ChessGame.TeamColor.BLACK);
+
+            if (checkmate || stalemate) {
+                game.setGameOver();
+            }
+            gameDataAccess.updateGameData(gameData);
+
+            List<ServerMessage> messages = new ArrayList<>();
+            messages.add(new LoadGameMessage(game));
+            messages.add(new NotificationMessage("Player made move " + move));
+
+            if (checkmate) {
+                System.out.println("In checkmate if");
+                messages.add(new NotificationMessage("Checkmate. Game Over."));
+            } else if (stalemate) {
+                System.out.println("In stalemate if");
+                messages.add(new NotificationMessage("Stalemate. Game Over."));
+            } else if (check) {
+                System.out.println("In check if");
+                messages.add(new NotificationMessage("Check."));
+            }
+            System.out.println("Messages: " + messages);
+            return messages;
+
         } catch (Exception ex) {
             throw new InternalServerException("Internal Server Error");
         }
-
     }
 
-    public List<ServerMessage> handleResign(UserGameCommand userGameCommand, Session session) {
-        return List.of();
+    public List<ServerMessage> handleResign(UserGameCommand userGameCommand, Session session) throws ChessServerException {
+        try {
+            int gameId = userGameCommand.getGameID();
+            String authToken = userGameCommand.getAuthToken();
+            String username = authDataAccess.getUsername(authToken);
+            GameData gameData = gameDataAccess.getGame(gameId);
+            ChessGame game = gameData.game();
+
+            game.setGameOver();
+            gameDataAccess.updateGameData(gameData);
+
+            NotificationMessage notificationMessage = new NotificationMessage("Player " + username + " has resigned. Game is now over.");
+            return List.of(notificationMessage);
+        } catch (DataAccessException e) {
+            throw new InternalServerException("Internal Server Error");
+        }
     }
     public List<ServerMessage> handleLeave(UserGameCommand userGameCommand, Session session) throws ChessServerException {
         try {

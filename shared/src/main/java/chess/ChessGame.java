@@ -15,6 +15,7 @@ public class ChessGame {
     private TeamColor turn;
     private ChessBoard board;
     private ChessBoard clonedBoard;
+    private boolean isGameOver = false;
 
     public ChessGame() {
         turn = TeamColor.WHITE;
@@ -28,6 +29,14 @@ public class ChessGame {
      */
     public TeamColor getTeamTurn() {
         return turn;
+    }
+
+    public void setGameOver() {
+        isGameOver = true;
+    }
+
+    public boolean getIsGameOver() {
+        return isGameOver;
     }
 
     /**

@@ -31,11 +31,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleConnect(WsConnectContext context) {
         // temp debugging
-        System.out.println("context object " + context);
         System.out.println("Query parameters " + context.queryParamMap());
-        System.out.println("URL " + context.getUpgradeCtx$javalin().fullUrl());
-        System.out.println("Session " + context.session);
-
         System.out.println("Opening");
 
         wsConnectionManager.register(context.session);
@@ -43,8 +39,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(WsMessageContext context) {
-        System.out.println("Handling message");
-        System.out.println(context);
+        System.out.println(context.message());
         try {
             UserGameCommand userGameCommand = parseCommand(context.message());
 
@@ -107,11 +102,14 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     case MAKE_MOVE -> {
                         if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
                             wsConnectionManager.broadcastMessageToAll(gameId, message);
+                        } else if (type == ServerMessage.ServerMessageType.ERROR) {
+                            context.session.getRemote().sendString(gson.toJson(message));
                         } else {
                             wsConnectionManager.broadcastMessage(gameId, context.session, message);
                         }
                     }
-                    case LEAVE, RESIGN -> wsConnectionManager.broadcastMessage(gameId, context.session, message);
+                    case LEAVE -> wsConnectionManager.broadcastMessage(gameId, context.session, message);
+                    case RESIGN -> wsConnectionManager.broadcastMessageToAll(gameId, message);
                 }
             }
 
