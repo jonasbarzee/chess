@@ -17,12 +17,10 @@ public class ChessGame {
     private ChessBoard clonedBoard;
 
     public ChessGame() {
-
         turn = TeamColor.WHITE;
         board = new ChessBoard();
         board.resetBoard();
         clonedBoard = board;
-
     }
 
     /**

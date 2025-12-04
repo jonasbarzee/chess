@@ -1,21 +1,23 @@
 package websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
 import dataaccess.model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import org.junit.jupiter.api.Assertions;
-import server.Server;
 import service.BadRequestException;
 import service.ChessServerException;
 import service.InternalServerException;
 import service.UnauthorizedException;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.util.Collection;
 import java.util.List;
 
 public class GameWebSocketService {
@@ -56,8 +58,28 @@ public class GameWebSocketService {
 
     }
 
-    public List<ServerMessage> handleMove(UserGameCommand userGameCommand, Session session) {
-        return List.of();
+    public List<ServerMessage> handleMove(MakeMoveCommand makeMoveCommand, Session session, int gameId) throws ChessServerException {
+        try {
+            System.out.println(makeMoveCommand.getMove());
+            ChessMove move = makeMoveCommand.getMove();
+            GameData gameData = gameDataAccess.getGame(gameId);
+            ChessGame game = gameData.game();
+            Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+
+            if (validMoves.contains(move)) {
+               game.makeMove(move);
+               gameDataAccess.updateGameData(gameData);
+            }
+
+            // check write here
+
+            ServerMessage loadGameMessage = new LoadGameMessage(gameData.game());
+            ServerMessage notificationMessage = new NotificationMessage("Player made move " + move);
+            return List.of(loadGameMessage, notificationMessage);
+        } catch (Exception ex) {
+            throw new InternalServerException("Internal Server Error");
+        }
+
     }
 
     public List<ServerMessage> handleResign(UserGameCommand userGameCommand, Session session) {
