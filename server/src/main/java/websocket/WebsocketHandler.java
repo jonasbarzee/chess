@@ -109,7 +109,14 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         }
                     }
                     case LEAVE -> wsConnectionManager.broadcastMessage(gameId, context.session, message);
-                    case RESIGN -> wsConnectionManager.broadcastMessageToAll(gameId, message);
+                    case RESIGN -> {
+                        if (type == ServerMessage.ServerMessageType.ERROR) {
+                            context.session.getRemote().sendString(gson.toJson(message));
+                        }
+                        else {
+                            wsConnectionManager.broadcastMessageToAll(gameId, message);
+                        }
+                    }
                 }
             }
 

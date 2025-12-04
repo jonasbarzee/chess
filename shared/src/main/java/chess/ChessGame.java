@@ -16,6 +16,8 @@ public class ChessGame {
     private ChessBoard board;
     private ChessBoard clonedBoard;
     private boolean isGameOver = false;
+    private boolean whiteResigned = false;
+    private boolean blackResigned = false;
 
     public ChessGame() {
         turn = TeamColor.WHITE;

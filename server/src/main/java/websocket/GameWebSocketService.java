@@ -130,6 +130,10 @@ public class GameWebSocketService {
             GameData gameData = gameDataAccess.getGame(gameId);
             ChessGame game = gameData.game();
 
+            if (!username.equalsIgnoreCase(gameData.whiteUsername()) && !username.equalsIgnoreCase(gameData.blackUsername()))
+                return List.of(new ErrorMessage("Error: Observer Cannot Resign"));
+
+
             game.setGameOver();
             gameDataAccess.updateGameData(gameData);
 
