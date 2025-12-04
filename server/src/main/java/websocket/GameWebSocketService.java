@@ -2,6 +2,7 @@ package websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
@@ -65,7 +66,11 @@ public class GameWebSocketService {
             System.out.println("Move: " + makeMoveCommand.getMove());
             ChessMove move = makeMoveCommand.getMove();
             GameData gameData = gameDataAccess.getGame(gameId);
+            String username = authDataAccess.getUsername(makeMoveCommand.getAuthToken());
+            System.out.println(gameData.whiteUsername() + " " + username);
+            ChessGame.TeamColor color = gameData.whiteUsername().equalsIgnoreCase(username.toLowerCase())? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
             ChessGame game = gameData.game();
+            ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
             Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
 
             if (game.getIsGameOver()) {
@@ -73,6 +78,11 @@ public class GameWebSocketService {
                 LoadGameMessage loadGameMessage = new LoadGameMessage(game);
                 ErrorMessage errorMessage = new ErrorMessage("No moves can be made, game is over.");
                 return List.of(loadGameMessage, errorMessage);
+            }
+
+            System.out.println(piece.getTeamColor() + " " + color);
+            if (piece.getTeamColor() != color) {
+                 return List.of( new ErrorMessage("Error: cannot move piece of not your color."));
             }
 
             if (!validMoves.contains(move)) {
