@@ -1,7 +1,6 @@
 package websocket;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
 import dataaccess.sqldao.SQLAuthDataAccess;
@@ -77,9 +76,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleClose(WsCloseContext context) {
         System.out.println("Closing");
-//        String gameId = context.queryParam("gameId");
-//        int gameIdInteger = Integer.parseInt(gameId);
-        wsConnectionManager.remove(context.session);
+        wsConnectionManager.removeOpenSessions(context.session);
     }
 
     private UserGameCommand parseCommand(String json) {
@@ -122,7 +119,4 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             ex.printStackTrace();
         }
    }
-
-    // implement the methods here like make_move, leave, resign, connect
-    // use the connections variable here to do things
 }

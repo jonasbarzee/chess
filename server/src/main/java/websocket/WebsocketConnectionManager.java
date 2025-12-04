@@ -22,12 +22,15 @@ public class WebsocketConnectionManager {
         gameSessions.computeIfAbsent(gameId, k -> ConcurrentHashMap.newKeySet()).add(session);
     }
 
-    public void remove(Session session) {
+    public void removeOpenSessions(Session session) {
         openSessions.remove(session);
-//        var set = gameSessions.get(gameId);
-//        if (set != null) {
-//            set.remove(session);
-//        }
+    }
+
+    public void removeGameSession(Session session, int gameId) {
+        Set<Session> set = gameSessions.get(gameId);
+        if (set != null) {
+            set.remove(session);
+        }
     }
 
     public void broadcastMessageToAll(Integer gameId, ServerMessage serverMessage) throws IOException {

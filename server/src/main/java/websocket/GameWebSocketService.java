@@ -85,7 +85,26 @@ public class GameWebSocketService {
     public List<ServerMessage> handleResign(UserGameCommand userGameCommand, Session session) {
         return List.of();
     }
-    public List<ServerMessage> handleLeave(UserGameCommand userGameCommand, Session session) {
-        return List.of();
-    }
+    public List<ServerMessage> handleLeave(UserGameCommand userGameCommand, Session session) throws ChessServerException {
+        try {
+            int gameId = userGameCommand.getGameID();
+            String authToken = userGameCommand.getAuthToken();
+            String username = authDataAccess.getUsername(authToken);
+            GameData gameData = gameDataAccess.getGame(gameId);
+
+            if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
+                gameDataAccess.updateGameData(new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
+            } else {
+                gameDataAccess.updateGameData(new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
+            }
+            websocketConnectionManager.removeOpenSessions(session);
+            websocketConnectionManager.removeGameSession(session, gameId);
+
+            NotificationMessage notificationMessage = new NotificationMessage("Player " + username + " left the game.");
+
+            return List.of(notificationMessage);
+        } catch (DataAccessException ex) {
+            throw new InternalServerException("Internal Server Error");
+        }
+   }
 }
