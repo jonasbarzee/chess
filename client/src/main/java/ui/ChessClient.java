@@ -191,7 +191,7 @@ public class ChessClient {
 
         // open connection and build the command
         this.webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
-        UserGameCommand joinGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameIdInt);
+        UserGameCommand joinGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameIdInt, playerColor);
         webSocketClient.send(gson.toJson(joinGameCommand));
         state = State.INGAME;
 
@@ -208,7 +208,7 @@ public class ChessClient {
         String end = params[1];
         ChessMove move = parseMove(start, end);
 
-        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move);
+        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move, playerColor);
         WebSocketClient webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
         webSocketClient.send(gson.toJson(makeMoveCommand));
         return "Move: " + move + "submitted";
@@ -229,14 +229,14 @@ public class ChessClient {
         state = State.OBSERVEGAME;
 
         this.webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
-        UserGameCommand observeGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameId);
+        UserGameCommand observeGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameId, null);
         webSocketClient.send(gson.toJson(observeGameCommand));
         return String.format("Observing game with id %d", gameId);
     }
 
     public String leaveGame() throws ResponseException {
         try {
-            UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, session.authToken(), gameId);
+            UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, session.authToken(), gameId, playerColor);
             webSocketClient.send(gson.toJson(leaveCommand));
         } catch (ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, "Error couldn't leave game");
@@ -253,7 +253,7 @@ public class ChessClient {
     public String resign() throws ResponseException {
 
         try {
-            UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, session.authToken(), gameId);
+            UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, session.authToken(), gameId, playerColor);
             webSocketClient.send(gson.toJson(resignCommand));
         } catch (ResponseException e) {
             throw new ResponseException(ResponseException.Code.ClientError, "Error couldn't resign from game");

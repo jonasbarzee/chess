@@ -46,7 +46,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UserGameCommand userGameCommand = parseCommand(context.message());
 
             List<ServerMessage> outgoingMessages = switch (userGameCommand.getCommandType()) {
-                case CONNECT -> gameWebSocketService.handleJoin(context.session, userGameCommand.getAuthToken(), userGameCommand.getGameID());
+                case CONNECT -> gameWebSocketService.handleJoin(context.session, userGameCommand.getAuthToken(), userGameCommand.getGameID(), userGameCommand);
                 case MAKE_MOVE -> {
                     MakeMoveCommand makeMoveCommand = (MakeMoveCommand) userGameCommand;
                     yield gameWebSocketService.handleMove(makeMoveCommand, context.session, makeMoveCommand.getGameID());

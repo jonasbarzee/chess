@@ -35,7 +35,8 @@ public class GameWebSocketService {
         this.websocketConnectionManager = websocketConnectionManager;
     }
 
-    public List<ServerMessage> handleJoin(Session session, String token, int gameId)  throws ChessServerException {
+    public List<ServerMessage> handleJoin(Session session, String token, int gameId, UserGameCommand joinCommand)  throws ChessServerException {
+        System.out.println();
         try {
             if (token == null || !authDataAccess.isAuthorized(token)) {
                 throw new UnauthorizedException("Unauthorized");
@@ -47,11 +48,14 @@ public class GameWebSocketService {
             }
 
             String username = authDataAccess.getUsername(token);
-            String color = gameData.whiteUsername().isEmpty() ? "white" : "black";
+            String requestedColor = joinCommand.getPlayerColor();
+            if (requestedColor == null) {
+                requestedColor = "observer";
+            }
             websocketConnectionManager.add(gameId, session);
 
             ServerMessage loadGameMessage = new LoadGameMessage(gameData.game());
-            ServerMessage notificationMessage = new NotificationMessage("Player " + username + " joined as " + color);
+            ServerMessage notificationMessage = new NotificationMessage("Player " + username + " joined as " + requestedColor);
             System.out.println(loadGameMessage);
             System.out.println(notificationMessage);
             return List.of(loadGameMessage, notificationMessage);
