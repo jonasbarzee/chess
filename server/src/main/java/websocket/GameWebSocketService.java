@@ -73,12 +73,7 @@ public class GameWebSocketService {
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
             Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
 
-            if (game.getIsGameOver()) {
-                System.out.println("Can't make move, game is over");
-                LoadGameMessage loadGameMessage = new LoadGameMessage(game);
-                ErrorMessage errorMessage = new ErrorMessage("No moves can be made, game is over.");
-                return List.of(loadGameMessage, errorMessage);
-            }
+
 
             System.out.println(piece.getTeamColor() + " " + color);
             if (piece.getTeamColor() != color) {
@@ -94,15 +89,30 @@ public class GameWebSocketService {
             boolean checkmate = game.isInCheckmate(ChessGame.TeamColor.WHITE) || game.isInCheckmate(ChessGame.TeamColor.BLACK);
             boolean stalemate = game.isInStalemate(ChessGame.TeamColor.WHITE) || game.isInStalemate(ChessGame.TeamColor.BLACK);
             boolean check = game.isInCheck(ChessGame.TeamColor.WHITE) || game.isInCheck(ChessGame.TeamColor.BLACK);
+            boolean resigned = game.isWhiteResigned() || game.isBlackResigned();
 
-            if (checkmate || stalemate) {
+            if (resigned) {
+                System.out.println("IN RESIGNED");
+                game.setGameOver(false);
+                gameDataAccess.updateGameData(gameData);
+                return List.of(new ErrorMessage("Cannot move after resign, game is considered over."));
+            }
+
+            if (game.getIsGameOver()) {
+                System.out.println("Can't make move, game is over");
+                LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+                ErrorMessage errorMessage = new ErrorMessage("No moves can be made, game is over.");
+                return List.of(loadGameMessage, errorMessage);
+            }
+
+            if (checkmate || stalemate ) {
                 game.setGameOver(true);
+                gameDataAccess.updateGameData(gameData);
             }
             gameDataAccess.updateGameData(gameData);
 
             List<ServerMessage> messages = new ArrayList<>();
             messages.add(new LoadGameMessage(game));
-            messages.add(new NotificationMessage("Player made move " + move));
 
             if (checkmate) {
                 System.out.println("In checkmate if");
@@ -113,6 +123,8 @@ public class GameWebSocketService {
             } else if (check) {
                 System.out.println("In check if");
                 messages.add(new NotificationMessage("Check."));
+            } else {
+                messages.add(new NotificationMessage("Player made move " + move));
             }
             System.out.println("Messages: " + messages);
             return messages;
