@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import exception.ResponseException;
 import jakarta.websocket.*;
-import websocket.commands.MakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -19,7 +18,7 @@ public class WebSocketClient extends Endpoint {
 
     Session session;
     ServerMessageHandler serverMessageHandler;
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     public WebSocketClient(String url, ServerMessageHandler serverMessageHandler) throws ResponseException {
         try {
@@ -61,9 +60,9 @@ public class WebSocketClient extends Endpoint {
                 ServerMessage serverMessage;
 
                 switch (type) {
-                    case "LOAD_GAME" -> serverMessage = gson.fromJson(message, LoadGameMessage.class);
-                    case "ERROR" -> serverMessage = gson.fromJson(message, ErrorMessage.class);
-                    case "NOTIFICATION" -> serverMessage = gson.fromJson(message, NotificationMessage.class);
+                    case "LOAD_GAME" -> serverMessage = GSON.fromJson(message, LoadGameMessage.class);
+                    case "ERROR" -> serverMessage = GSON.fromJson(message, ErrorMessage.class);
+                    case "NOTIFICATION" -> serverMessage = GSON.fromJson(message, NotificationMessage.class);
                     default -> {
                         System.err.println("Unknown server message type: " + type);
                         return;
