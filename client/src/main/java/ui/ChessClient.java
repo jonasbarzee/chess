@@ -305,7 +305,9 @@ public class ChessClient {
             }
             case INGAME -> {
                 return """
-                        exit - exit the joined chess game
+                        leave - leave the joined chess game
+                        resign - resign the joined chess game
+                        move - make a move <startPos> <endPos>
                         """;
             }
             default -> {

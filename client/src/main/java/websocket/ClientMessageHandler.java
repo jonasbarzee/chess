@@ -16,8 +16,6 @@ public class ClientMessageHandler implements ServerMessageHandler {
 
     public void notify(ServerMessage serverMessage) {
         ServerMessage.ServerMessageType type = serverMessage.getServerMessageType();
-        System.out.println(serverMessage);
-        System.out.println(type);
         switch (type) {
             case LOAD_GAME -> handleLoadGame((LoadGameMessage) serverMessage);
             case ERROR -> handleError((ErrorMessage) serverMessage);
@@ -37,7 +35,7 @@ public class ClientMessageHandler implements ServerMessageHandler {
     }
 
     public void handleNotification(NotificationMessage notificationMessage) {
-        System.out.println("Notification: " + notificationMessage);
+        System.out.println("Notification: " + notificationMessage.getMessage());
 
     }
 }
