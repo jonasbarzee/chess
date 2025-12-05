@@ -1,9 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 
 public class BoardPrinter {
 
@@ -18,6 +19,10 @@ public class BoardPrinter {
     private static final String RESET_BACK = EscapeSequences.RESET_BG_COLOR;
 
     public static void printBoard(ChessBoard board, boolean white) {
+        printBoard(board, white, null, Collections.emptySet());
+    }
+
+    public static void printBoard(ChessBoard board, boolean white, ChessPosition highlightFrom, Set<ChessPosition> highlightTo) {
         printBoardHeader(white);
 
         for (int dr = 0; dr < 8; dr++) {
@@ -28,10 +33,15 @@ public class BoardPrinter {
             for (int dc = 0; dc < 8; dc++) {
                 int col = mapCol(dc, white);
 
+                ChessPosition position = new ChessPosition(row, col);
+
+                boolean highlightFromSquare = highlightFrom != null && highlightFrom.equals(position);
+                boolean highlightToSquare = highlightTo != null && highlightTo.contains(position);
+
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 boolean darkSquare = (row + col) % 2 == 0;
 
-                printSquare(piece, darkSquare);
+                printSquare(piece, darkSquare, highlightFromSquare, highlightToSquare);
             }
             System.out.println(" " + row);
         }
@@ -69,10 +79,20 @@ public class BoardPrinter {
         return piece.getTeamColor() == ChessGame.TeamColor.WHITE ? WHITE_PIECE_COLOR : BLACK_PIECE_COLOR;
     }
 
-    private static void printSquare(ChessPiece piece, boolean isDark) {
-        String bg = isDark ? DARK_BACK : LIGHT_BACK;
+    private static void printSquare(ChessPiece piece, boolean isDark, boolean highlightFrom, boolean highlightTo) {
+        String bg;
+
+        if (highlightFrom) {
+            bg = "\u001B[42m";
+        } else if (highlightTo) {
+            bg = "\u001B[43m";
+        } else {
+            bg = isDark ? DARK_BACK : LIGHT_BACK;
+        }
+
         String content = renderPiece(piece);
         String color = renderColor(piece);
+
         System.out.print(color + bg + TEXT_BOLD + " " + content + " " + RESET_BACK + RESET_TEXT + RESET_TEXT_BOLD);
     }
 }

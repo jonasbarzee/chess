@@ -71,6 +71,7 @@ public class ChessClient {
                 case "logout" -> logout();
                 case "resign" -> resign();
                 case "redraw" -> redraw();
+                case "highlight" -> highlight(params);
                 case "list" -> listGames();
                 case "move" -> makeMove(params);
                 case "exit" -> "exit";
@@ -214,6 +215,59 @@ public class ChessClient {
         return "Move: " + move + "submitted";
     }
 
+    public String highlight(String... params) throws ResponseException {
+        assertLoggedIn();
+        if (params.length != 1) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <pos>");
+        }
+
+        String pos = params[0];
+        ChessPosition position = parsePositionHighlight(pos);
+        ChessGame game = currentGame;
+        boolean whitePerspective;
+
+        if (game == null) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Not in a game");
+        }
+
+        if (playerColor.equalsIgnoreCase("black")) {
+            whitePerspective = false;
+        } else {
+            whitePerspective = true;
+        }
+
+        Collection<ChessMove> legalMoves = game.validMoves(position);
+        Set<ChessPosition> validPositions = new HashSet<>();
+
+
+        for (ChessMove move : legalMoves) {
+            validPositions.add(move.getEndPosition());
+
+        }
+
+        BoardPrinter.printBoard(game.getBoard(), whitePerspective, position, validPositions);
+
+        return "";
+    }
+
+    private ChessPosition parsePositionHighlight(String pos) throws ResponseException {
+        if (pos == null || pos.length() != 2) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Expected <pos>");
+        }
+
+        char file = pos.charAt(0);
+        char rank = pos.charAt(1);
+
+        if (file < 'a' || file > 'h' || rank < '1' || rank > '8') {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid square: " + pos);
+        }
+
+        int row = rank - '1' + 1;
+        int col = file - 'a' + 1;
+
+        return new ChessPosition(row, col);
+    }
+
     public String observeGame(String... params) throws ResponseException {
         assertLoggedIn();
         if (params.length != 1) {
@@ -278,6 +332,7 @@ public class ChessClient {
         };
         BoardPrinter.printBoard(chessBoard, whitePerspective);
     }
+
 
     public void setCurrentGame(ChessGame chessGame) {
         this.currentGame = chessGame;
@@ -356,9 +411,9 @@ public class ChessClient {
                 return """
                         leave - leave the joined chess game
                         resign - resign the joined chess game
-                        move - make a move <startPos> <endPos>
+                        move <startPos> <endPos> - make a move
                         redraw - redraw the chess board
-                        highlight - legal moves
+                        highlight <pos> - legal moves
                         help - print possible commands
                         """;
             }
@@ -366,7 +421,7 @@ public class ChessClient {
                 return """ 
                         leave - leave the joined chess game
                         redraw - redraw the chess board
-                        highlight - legal moves
+                        highlight <pos> - legal moves
                         help - print possible commands
                         """;
             }
