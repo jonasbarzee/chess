@@ -1,33 +1,41 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import chess.request.*;
 import chess.result.*;
+import com.google.gson.Gson;
 import exception.ResponseException;
 import gamecatalog.GameCatalog;
 import model.Session;
 import serverfacade.ServerFacade;
-import websocket.ServerMessageHandler;
-import websocket.messages.ServerMessage;
+import websocket.ClientMessageHandler;
+import websocket.WebSocketClient;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 
 import java.util.*;
 
-public class ChessClient implements ServerMessageHandler  {
+public class ChessClient {
 
     private State state = State.LOGGEDOUT;
     private String username;
     private String password;
     private Session session;
+    private String playerColor;
+    private Integer gameId;
+    private ChessGame currentGame;
     private final GameCatalog gameCatalog = new GameCatalog();
     private final ServerFacade server;
+    private final String serverUrl;
+    private final Gson gson = new Gson();
 
     public ChessClient(String serverUrl) {
+        this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
-    }
-
-    public void notify(ServerMessage serverMessage) {
-        System.out.println(serverMessage.toString());
-    }
+   }
 
     public void run() {
         System.out.println("Welcome to Jonas' CS 240 Chess Client. Login or Register to start. Type Help for commands.");
@@ -60,6 +68,7 @@ public class ChessClient implements ServerMessageHandler  {
                 case "observe" -> observeGame(params);
                 case "logout" -> logout();
                 case "list" -> listGames();
+                case "move" -> makeMove(params);
                 case "exit" -> "exit";
                 default -> help();
             };
@@ -169,15 +178,35 @@ public class ChessClient implements ServerMessageHandler  {
         }
 
         try {
-            JoinGameResult joinGameResult = server.joinGame(new JoinGameRequest(session.authToken(), playerColor, serverId));
+             server.joinGame(new JoinGameRequest(session.authToken(), playerColor, serverId));
         } catch (ResponseException e) {
             return ExceptionHandler.handle(e);
         }
+        this.playerColor = playerColor;
+        this.gameId = gameIdInt;
 
-        ChessBoard chessBoard = new ChessBoard();
-        chessBoard.resetBoard();
-        BoardPrinter.printBoard(chessBoard, playerColor.equals("white"));
+        // open connection and build the command
+        WebSocketClient webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
+        UserGameCommand joinGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameIdInt);
+        webSocketClient.send(gson.toJson(joinGameCommand));
+
         return String.format("Joined game with id %s", gameIdInt);
+    }
+
+    public String makeMove(String... params) throws ResponseException {
+        assertLoggedIn();
+        if (params.length != 2) {
+           throw new ResponseException(ResponseException.Code.ClientError, "Expected <start pos> <end pos>");
+        }
+
+        String start = params[0];
+        String end = params[1];
+        ChessMove move = parseMove(start, end);
+
+        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move);
+        WebSocketClient webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
+        webSocketClient.send(gson.toJson(makeMoveCommand));
+        return "Move: " + move + "submitted";
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -199,6 +228,46 @@ public class ChessClient implements ServerMessageHandler  {
         return String.format("Observing game with id %d", gameId);
     }
 
+    public void drawBoard(ChessBoard chessBoard) {
+        boolean whitePerspective = switch (playerColor) {
+            case "white" -> true;
+            case "black" -> false;
+            default -> true;
+        };
+        BoardPrinter.printBoard(chessBoard, whitePerspective);
+    }
+
+    public void setCurrentGame(ChessGame chessGame) {
+        this.currentGame = chessGame;
+    }
+
+    private ChessMove parseMove(String start, String end) throws ResponseException {
+        try {
+            ChessPosition startPos = parsePosition(start);
+            ChessPosition endPos = parsePosition(end);
+            return new ChessMove(startPos, endPos, null);
+        } catch (ResponseException e) {
+            ExceptionHandler.handle(e);
+        }
+        throw new ResponseException(ResponseException.Code.ClientError, "Couldn't parse move");
+   }
+
+    private ChessPosition parsePosition(String position) throws ResponseException {
+        if (position.length() != 2) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid coordinates for move");
+        }
+        char fileChar = position.charAt(0);
+        char rankChar = position.charAt(1);
+
+        int col = fileChar - 'a' + 1;
+        int row = rankChar - '0';
+
+        if (row < 1 || row > 8 || col < 1 || col > 8) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid coordinates for move");
+        }
+
+        return new ChessPosition(row, col);
+    }
 
     private Integer parseGameId(String string) throws ResponseException {
         try {

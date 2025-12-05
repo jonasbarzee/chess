@@ -1,8 +1,14 @@
 package websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import exception.ResponseException;
 import jakarta.websocket.*;
+import websocket.commands.MakeMoveCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -50,25 +56,32 @@ public class WebSocketClient extends Endpoint {
         session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {
-                ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+                String type = jsonObject.get("serverMessageType").getAsString();
+                ServerMessage serverMessage;
+
+                switch (type) {
+                    case "LOAD_GAME" -> serverMessage = gson.fromJson(message, LoadGameMessage.class);
+                    case "ERROR" -> serverMessage = gson.fromJson(message, ErrorMessage.class);
+                    case "NOTIFICATION" -> serverMessage = gson.fromJson(message, NotificationMessage.class);
+                    default -> {
+                        System.err.println("Unknown server message type: " + type);
+                        return;
+                    }
+                }
                 serverMessageHandler.notify(serverMessage);
             }
         });
         System.out.println("Connected message handler");
     }
 
-// do I need these overridden methods?
-//    @Override
-//    public void onClose(Session session, CloseReason closeReason) {
-//        serverMessageHandler.onClose(closeReason);
-//    }
-//
-//    @Override
-//    public void onError(Session session, Throwable thr) {
-//        serverMessageHandler.onError(thr);
-//    }
+    @Override
+    public void onClose(Session session, CloseReason closeReason) {
+        System.out.println("Websocket closed, reason: " + closeReason);
+    }
 
-    // still need methods for each action of the user
-    // this should be done in the ChessClient class i think?
-    // maybe write it in a different class
+    @Override
+    public void onError(Session session, Throwable thr) {
+        thr.printStackTrace();
+    }
 }
