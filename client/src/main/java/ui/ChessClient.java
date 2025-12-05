@@ -69,6 +69,8 @@ public class ChessClient {
                 case "observe" -> observeGame(params);
                 case "leave" -> leaveGame();
                 case "logout" -> logout();
+                case "resign" -> resign();
+                case "redraw" -> redraw();
                 case "list" -> listGames();
                 case "move" -> makeMove(params);
                 case "exit" -> "exit";
@@ -243,9 +245,27 @@ public class ChessClient {
         return "Left game" + gameId;
     }
 
+    public String redraw() throws ResponseException {
+        drawBoard(currentGame.getBoard());
+        return "Refreshed board";
+    }
+
+    public String resign() throws ResponseException {
+
+        try {
+            UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, session.authToken(), gameId);
+            webSocketClient.send(gson.toJson(resignCommand));
+        } catch (ResponseException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Error couldn't resign from game");
+        }
+        state = State.LOGGEDIN;
+        return "Resigned from game" + gameId;
+    }
+
     public void drawBoard(ChessBoard chessBoard) {
         if (playerColor == null) {
             BoardPrinter.printBoard(chessBoard, true);
+            return;
         }
 
         boolean whitePerspective = switch (playerColor) {
@@ -334,6 +354,14 @@ public class ChessClient {
                         leave - leave the joined chess game
                         resign - resign the joined chess game
                         move - make a move <startPos> <endPos>
+                        redraw - redraw the chess board
+                        highlight - legal moves
+                        help - print possible commands
+                        """;
+            }
+            case OBSERVEGAME -> {
+                return """ 
+                        leave - leave the joined chess game
                         redraw - redraw the chess board
                         highlight - legal moves
                         help - print possible commands
