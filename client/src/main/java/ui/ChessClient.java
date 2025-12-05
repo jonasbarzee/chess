@@ -31,6 +31,7 @@ public class ChessClient {
     private final ServerFacade server;
     private final String serverUrl;
     private final Gson gson = new Gson();
+    private WebSocketClient webSocketClient;
 
     public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -66,6 +67,7 @@ public class ChessClient {
                 case "create" -> create(params);
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
+                case "leave" -> leaveGame();
                 case "logout" -> logout();
                 case "list" -> listGames();
                 case "move" -> makeMove(params);
@@ -186,9 +188,10 @@ public class ChessClient {
         this.gameId = gameIdInt;
 
         // open connection and build the command
-        WebSocketClient webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
+        this.webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
         UserGameCommand joinGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameIdInt);
         webSocketClient.send(gson.toJson(joinGameCommand));
+        state = State.INGAME;
 
         return String.format("Joined game with id %s", gameIdInt);
     }
@@ -221,14 +224,30 @@ public class ChessClient {
         if (serverIdFromClientId == null) {
             throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: not a valid game.");
         }
+        state = State.OBSERVEGAME;
 
-        ChessBoard chessBoard = new ChessBoard();
-        chessBoard.resetBoard();
-        BoardPrinter.printBoard(chessBoard, true);
+        this.webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
+        UserGameCommand observeGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, session.authToken(), gameId);
+        webSocketClient.send(gson.toJson(observeGameCommand));
         return String.format("Observing game with id %d", gameId);
     }
 
+    public String leaveGame() throws ResponseException {
+        try {
+            UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, session.authToken(), gameId);
+            webSocketClient.send(gson.toJson(leaveCommand));
+        } catch (ResponseException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Error couldn't leave game");
+        }
+        state = State.LOGGEDIN;
+        return "Left game" + gameId;
+    }
+
     public void drawBoard(ChessBoard chessBoard) {
+        if (playerColor == null) {
+            BoardPrinter.printBoard(chessBoard, true);
+        }
+
         boolean whitePerspective = switch (playerColor) {
             case "white" -> true;
             case "black" -> false;
@@ -239,6 +258,13 @@ public class ChessClient {
 
     public void setCurrentGame(ChessGame chessGame) {
         this.currentGame = chessGame;
+    }
+
+    private Collection<ChessMove> getLegalMoves(ChessPosition position) {
+        if (currentGame == null) {
+            return List.of();
+        }
+        return currentGame.validMoves(position);
     }
 
     private ChessMove parseMove(String start, String end) throws ResponseException {
@@ -308,6 +334,9 @@ public class ChessClient {
                         leave - leave the joined chess game
                         resign - resign the joined chess game
                         move - make a move <startPos> <endPos>
+                        redraw - redraw the chess board
+                        highlight - legal moves
+                        help - print possible commands
                         """;
             }
             default -> {
