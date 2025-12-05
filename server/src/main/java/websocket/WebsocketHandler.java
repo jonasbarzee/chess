@@ -12,6 +12,7 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // temp debugging
         System.out.println("Query parameters " + context.queryParamMap());
         System.out.println("Opening");
+        context.session.setIdleTimeout(Duration.ofMinutes(10));
 
         wsConnectionManager.register(context.session);
     }
