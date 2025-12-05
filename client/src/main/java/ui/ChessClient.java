@@ -226,6 +226,8 @@ public class ChessClient {
         if (serverIdFromClientId == null) {
             throw new ResponseException(ResponseException.Code.ClientError, "Invalid game ID: not a valid game.");
         }
+
+        this.gameId = gameId;
         state = State.OBSERVEGAME;
 
         this.webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
@@ -235,6 +237,7 @@ public class ChessClient {
     }
 
     public String leaveGame() throws ResponseException {
+        System.out.println("GAME ID FOR OBSERVER " + gameId);
         try {
             UserGameCommand leaveCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, session.authToken(), gameId, playerColor);
             webSocketClient.send(gson.toJson(leaveCommand));

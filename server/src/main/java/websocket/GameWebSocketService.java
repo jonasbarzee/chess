@@ -19,6 +19,7 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -128,7 +129,7 @@ public class GameWebSocketService {
                 System.out.println("In check if");
                 messages.add(new NotificationMessage("Check."));
             } else {
-                messages.add(new NotificationMessage("Player made move " + move));
+                messages.add(new NotificationMessage("Player " + username + " made move " + makeMoveCommand.getMove().toString()));
             }
             System.out.println("Messages: " + messages);
             return messages;
@@ -170,22 +171,36 @@ public class GameWebSocketService {
     }
     public List<ServerMessage> handleLeave(UserGameCommand userGameCommand, Session session) throws ChessServerException {
         try {
+            System.out.println("HERE");
             int gameId = userGameCommand.getGameID();
             String authToken = userGameCommand.getAuthToken();
             String username = authDataAccess.getUsername(authToken);
             GameData gameData = gameDataAccess.getGame(gameId);
+            String color = userGameCommand.getPlayerColor();
+            String observer = "";
+
+            if (color == null) {
+                observer = "(observer)";
+
+            }
 
             if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
                 gameDataAccess.updateGameData(new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
             } else {
                 gameDataAccess.updateGameData(new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
             }
+
+
+            NotificationMessage notificationMessage = new NotificationMessage("Player " + username + " left the game." + observer);
+            try {
+                websocketConnectionManager.broadcastMessage(gameId, session, notificationMessage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             websocketConnectionManager.removeOpenSessions(session);
             websocketConnectionManager.removeGameSession(session, gameId);
 
-            NotificationMessage notificationMessage = new NotificationMessage("Player " + username + " left the game.");
-
-            return List.of(notificationMessage);
+            return List.of();
         } catch (DataAccessException ex) {
             throw new InternalServerException("Internal Server Error");
         }
