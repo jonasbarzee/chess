@@ -33,8 +33,8 @@ public class ChessGame {
         return turn;
     }
 
-    public void setGameOver() {
-        isGameOver = true;
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
     }
 
     public boolean getIsGameOver() {
@@ -55,6 +55,22 @@ public class ChessGame {
                 turn = TeamColor.BLACK;
             }
         }
+    }
+
+    public boolean isWhiteResigned() {
+        return whiteResigned;
+    }
+
+    public void setWhiteResigned(boolean whiteResigned) {
+        this.whiteResigned = whiteResigned;
+    }
+
+    public boolean isBlackResigned() {
+        return blackResigned;
+    }
+
+    public void setBlackResigned(boolean blackResigned) {
+        this.blackResigned = blackResigned;
     }
 
     /**

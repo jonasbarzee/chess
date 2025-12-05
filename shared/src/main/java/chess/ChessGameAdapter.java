@@ -11,6 +11,9 @@ public class ChessGameAdapter implements JsonSerializer<ChessGame>, JsonDeserial
         JsonObject json = new JsonObject();
         json.addProperty("turn", game.getTeamTurn().toString());
         json.add("board", context.serialize(game.getBoard()));
+        json.add("isGameOver", context.serialize(game.getIsGameOver()));
+        json.add("whiteResigned", context.serialize(game.isWhiteResigned()));
+        json.add("blackResigned", context.serialize(game.isBlackResigned()));
         return json;
     }
 
@@ -19,10 +22,19 @@ public class ChessGameAdapter implements JsonSerializer<ChessGame>, JsonDeserial
         JsonObject object = json.getAsJsonObject();
         ChessGame.TeamColor turn = ChessGame.TeamColor.valueOf(object.get("turn").getAsString());
         ChessBoard board = context.deserialize(object.get("board"), ChessBoard.class);
-
         ChessGame game = new ChessGame();
         game.setTeamTurn(turn);
         game.setBoard(board);
+
+        if (object.has("isGameOver")) {
+            game.setGameOver(object.get("isGameOver").getAsBoolean());
+        }
+        if (object.has("whiteResigned")) {
+            game.setWhiteResigned(object.get("whiteResigned").getAsBoolean());
+        }
+        if (object.has("blackResigned")) {
+            game.setBlackResigned(object.get("blackResigned").getAsBoolean());
+        }
         return game;
     }
 }

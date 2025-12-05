@@ -96,7 +96,7 @@ public class GameWebSocketService {
             boolean check = game.isInCheck(ChessGame.TeamColor.WHITE) || game.isInCheck(ChessGame.TeamColor.BLACK);
 
             if (checkmate || stalemate) {
-                game.setGameOver();
+                game.setGameOver(true);
             }
             gameDataAccess.updateGameData(gameData);
 
@@ -133,8 +133,17 @@ public class GameWebSocketService {
             if (!username.equalsIgnoreCase(gameData.whiteUsername()) && !username.equalsIgnoreCase(gameData.blackUsername()))
                 return List.of(new ErrorMessage("Error: Observer Cannot Resign"));
 
+            if (game.isWhiteResigned() || game.isBlackResigned()) {
+                return List.of(new ErrorMessage("Error Cannot resign more than once"));
+            }
 
-            game.setGameOver();
+            if (username.equalsIgnoreCase(gameData.whiteUsername())) {
+                game.setWhiteResigned(true);
+            } else {
+                game.setBlackResigned(true);
+            }
+
+            game.setGameOver(true);
             gameDataAccess.updateGameData(gameData);
 
             NotificationMessage notificationMessage = new NotificationMessage("Player " + username + " has resigned. Game is now over.");
