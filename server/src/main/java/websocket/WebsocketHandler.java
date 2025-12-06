@@ -102,10 +102,13 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         }
                     }
                     case MAKE_MOVE -> {
+                        System.out.println(message);
                         if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
                             wsConnectionManager.broadcastMessageToAll(gameId, message);
                         } else if (type == ServerMessage.ServerMessageType.ERROR) {
                             context.session.getRemote().sendString(gson.toJson(message));
+                        } else if (type == ServerMessage.ServerMessageType.NOTIFICATION && gson.toJson(message).contains("check")){
+                            wsConnectionManager.broadcastMessageToAll(gameId, message);
                         } else {
                             wsConnectionManager.broadcastMessage(gameId, context.session, message);
                         }

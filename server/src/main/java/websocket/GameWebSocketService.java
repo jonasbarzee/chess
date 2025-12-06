@@ -3,6 +3,7 @@ package websocket;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.AuthDataAccess;
 import dataaccess.interfaces.GameDataAccess;
@@ -73,7 +74,6 @@ public class GameWebSocketService {
             ChessPiece.PieceType promo = makeMoveCommand.getPromoPiece();
             ChessMove move = new ChessMove(original.getStartPosition(), original.getEndPosition(), promo);
 
-
             GameData gameData = gameDataAccess.getGame(gameId);
             String username = authDataAccess.getUsername(makeMoveCommand.getAuthToken());
             System.out.println(gameData.whiteUsername() + " " + username);
@@ -82,23 +82,27 @@ public class GameWebSocketService {
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
             Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
 
-
-
             System.out.println(piece.getTeamColor() + " " + color);
             if (piece.getTeamColor() != color) {
-                 return List.of( new ErrorMessage("Error: cannot move piece of not your color."));
+                 return List.of( new ErrorMessage("cannot move piece of not your color."));
             }
 
             if (!validMoves.contains(move)) {
                 System.out.println("Can't make move, not a valid move");
-                return List.of(new ErrorMessage("Error: Not a valid move."));
+                return List.of(new ErrorMessage("Not a valid move."));
             }
             game.makeMove(move);
 
-            boolean checkmate = game.isInCheckmate(ChessGame.TeamColor.WHITE) || game.isInCheckmate(ChessGame.TeamColor.BLACK);
-            boolean stalemate = game.isInStalemate(ChessGame.TeamColor.WHITE) || game.isInStalemate(ChessGame.TeamColor.BLACK);
-            boolean check = game.isInCheck(ChessGame.TeamColor.WHITE) || game.isInCheck(ChessGame.TeamColor.BLACK);
+            ChessGame.TeamColor opponent = (color == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+
+            boolean checkmate = game.isInCheckmate(opponent);
+            boolean stalemate = game.isInStalemate(opponent);
+            boolean check = game.isInCheck(opponent);
             boolean resigned = game.isWhiteResigned() || game.isBlackResigned();
+
+            System.out.println();
+            System.out.println("Opponent in check: " + check);
+            System.out.println("Opponent in checkmate: " + checkmate);
 
             if (resigned) {
                 System.out.println("IN RESIGNED");
@@ -116,29 +120,32 @@ public class GameWebSocketService {
 
             if (checkmate || stalemate ) {
                 game.setGameOver(true);
-                gameDataAccess.updateGameData(gameData);
             }
-            gameDataAccess.updateGameData(gameData);
+            GameData toUpdate = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
+            gameDataAccess.updateGameData(toUpdate);
 
             List<ServerMessage> messages = new ArrayList<>();
             messages.add(new LoadGameMessage(game));
 
-            if (checkmate) {
-                System.out.println("In checkmate if");
-                messages.add(new NotificationMessage("Player " + username + " in checkmate. Game Over."));
-            } else if (stalemate) {
-                System.out.println("In stalemate if");
-                messages.add(new NotificationMessage("Stalemate. Game Over."));
-            } else if (check) {
+//            if (checkmate) {
+//                System.out.println("In checkmate if");
+//                messages.add(new NotificationMessage("Player " + username + " in checkmate. Game Over."));
+              if (stalemate) {
+                  System.out.println("In stalemate if");
+                  messages.add(new NotificationMessage("Stalemate. Game Over."));
+              }
+            if (check) {
                 System.out.println("In check if");
                 messages.add(new NotificationMessage("Player " + username + " in check."));
-            } else {
-                messages.add(new NotificationMessage("Player " + username + " made move " + makeMoveCommand.getPrettyMove()));
             }
+
+                messages.add(new NotificationMessage("Player " + username + " made move " + makeMoveCommand.getPrettyMove()));
+
             System.out.println("Messages: " + messages);
             return messages;
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new InternalServerException("Internal Server Error");
         }
     }
