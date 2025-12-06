@@ -34,43 +34,32 @@ public class WebsocketConnectionManager {
     }
 
     public void broadcastMessageToAll(Integer gameId, ServerMessage serverMessage) throws IOException {
-        System.out.println("Broadcasting message to All");
-        System.out.println("Server Message " + serverMessage.getServerMessageType());
-        String msg = gson.toJson(serverMessage);
-        System.out.println("parsed to Json");
-
-        System.out.println("Sessions in game " + gameId + ": " + gameSessions.get(gameId));
-
-        for (Session session : gameSessions.getOrDefault(gameId, Set.of())) {
-            if (session.isOpen()) {
-                try {
-                    session.getRemote().sendString(msg);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    gameSessions.get(gameId).remove(session);
-                }
-            }
-        }
-        System.out.println("Messages Sent");
+        broadcastInternal(gameId, null, serverMessage, true);
     }
 
-
     public void broadcastMessage(Integer gameId, Session excludeSession, ServerMessage serverMessage) throws IOException {
-        System.out.println("Broadcasting message");
-        System.out.println("Server Message " + serverMessage.getServerMessageType());
-        String msg = gson.toJson(serverMessage);
+        broadcastInternal(gameId, excludeSession, serverMessage, false);
+    }
+
+    private void broadcastInternal(Integer gameId, Session exclude, ServerMessage msgObj, boolean toAll) throws IOException {
+        System.out.println("Broadcasting message" + (toAll ? " to All" : ""));
+        System.out.println("Server Message " + msgObj.getServerMessageType());
+
+        String msg = gson.toJson(msgObj);
         System.out.println("parsed to Json");
 
-        System.out.println("Sessions in game " + gameId + ": " + gameSessions.get(gameId));
+        Set<Session> sessions = gameSessions.getOrDefault(gameId, Set.of());
+        System.out.println("Sessions in game " + gameId + ": " + sessions);
 
-        for (Session session : gameSessions.getOrDefault(gameId, Set.of())) {
-            if (session.isOpen() && session != excludeSession) {
-                try {
-                    session.getRemote().sendString(msg);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    gameSessions.get(gameId).remove(session);
-                }
+        for (Session session : sessions) {
+            if (!session.isOpen()) continue;
+            if (!toAll && session == exclude) continue;
+
+            try {
+                session.getRemote().sendString(msg);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                gameSessions.get(gameId).remove(session);
             }
         }
         System.out.println("Messages Sent");
