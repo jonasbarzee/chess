@@ -390,13 +390,6 @@ public class ChessClient {
         this.currentGame = chessGame;
     }
 
-    private Collection<ChessMove> getLegalMoves(ChessPosition position) {
-        if (currentGame == null) {
-            return List.of();
-        }
-        return currentGame.validMoves(position);
-    }
-
     private ChessMove parseMove(String start, String end) throws ResponseException {
         try {
             ChessPosition startPos = parsePosition(start);
