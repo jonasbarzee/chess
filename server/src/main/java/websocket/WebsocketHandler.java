@@ -88,45 +88,49 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void sendMessages(Collection<ServerMessage> serverMessages, UserGameCommand userGameCommand, WsMessageContext context) {
-        try {
-            int gameId = userGameCommand.getGameID();
-            for (ServerMessage message : serverMessages) {
-                ServerMessage.ServerMessageType type = message.getServerMessageType();
-
-                switch (userGameCommand.getCommandType()) {
-                    case CONNECT -> {
-                        if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
-                            context.session.getRemote().sendString(gson.toJson(message));
-                        } else {
-                            wsConnectionManager.broadcastMessage(gameId, context.session, message);
-                        }
-                    }
-                    case MAKE_MOVE -> {
-                        System.out.println(message);
-                        if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
-                            wsConnectionManager.broadcastMessageToAll(gameId, message);
-                        } else if (type == ServerMessage.ServerMessageType.ERROR) {
-                            context.session.getRemote().sendString(gson.toJson(message));
-                        } else if (type == ServerMessage.ServerMessageType.NOTIFICATION && gson.toJson(message).contains("check")){
-                            wsConnectionManager.broadcastMessageToAll(gameId, message);
-                        } else {
-                            wsConnectionManager.broadcastMessage(gameId, context.session, message);
-                        }
-                    }
-                    case LEAVE -> wsConnectionManager.broadcastMessage(gameId, context.session, message);
-                    case RESIGN -> {
-                        if (type == ServerMessage.ServerMessageType.ERROR) {
-                            context.session.getRemote().sendString(gson.toJson(message));
-                        }
-                        else {
-                            wsConnectionManager.broadcastMessageToAll(gameId, message);
-                        }
-                    }
-                }
-            }
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        for (ServerMessage message : serverMessages) {
+            sendMessageLogic(userGameCommand, context, message);
         }
+   }
+
+   private void sendMessageLogic(UserGameCommand userGameCommand, WsMessageContext context, ServerMessage message) {
+       ServerMessage.ServerMessageType type = message.getServerMessageType();
+       int gameId = userGameCommand.getGameID();
+
+       try {
+
+           switch (userGameCommand.getCommandType()) {
+               case CONNECT -> {
+                   if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
+                       context.session.getRemote().sendString(gson.toJson(message));
+                   } else {
+                       wsConnectionManager.broadcastMessage(gameId, context.session, message);
+                   }
+               }
+               case MAKE_MOVE -> {
+                   System.out.println(message);
+                   if (type == ServerMessage.ServerMessageType.LOAD_GAME) {
+                       wsConnectionManager.broadcastMessageToAll(gameId, message);
+                   } else if (type == ServerMessage.ServerMessageType.ERROR) {
+                       context.session.getRemote().sendString(gson.toJson(message));
+                   } else if (type == ServerMessage.ServerMessageType.NOTIFICATION && gson.toJson(message).contains("check")){
+                       wsConnectionManager.broadcastMessageToAll(gameId, message);
+                   } else {
+                       wsConnectionManager.broadcastMessage(gameId, context.session, message);
+                   }
+               }
+               case LEAVE -> wsConnectionManager.broadcastMessage(gameId, context.session, message);
+               case RESIGN -> {
+                   if (type == ServerMessage.ServerMessageType.ERROR) {
+                       context.session.getRemote().sendString(gson.toJson(message));
+                   }
+                   else {
+                       wsConnectionManager.broadcastMessageToAll(gameId, message);
+                   }
+               }
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
    }
 }
