@@ -261,29 +261,6 @@ public class ChessGame {
         }
         return true;
     }
-//
-//    public boolean isInCheckmate(TeamColor teamColor) {
-//        if (!isInCheck(teamColor)) {
-//            return false;
-//        }
-//
-//        Collection<ChessPosition> allPositionsOnBoard = getAllyPositions(teamColor);
-//
-//        // for each piece on the team
-//        for (ChessPosition pos : allPositionsOnBoard) {
-//            ChessPiece piece = board.getPiece(pos);
-//            if (piece == null || piece.getTeamColor() != teamColor) continue;
-//
-//            // get all legal moves for that piece
-//            for (ChessMove move : validMoves(pos)) {
-//                    makeMoveOnCloneBoard(allyMove);
-//                if (!cloned.isInCheck(teamColor)) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
 
     private Collection<ChessPosition> getAllyPositions(TeamColor teamColor) {
         Collection<ChessPosition> allyPositions = new ArrayList<>();
