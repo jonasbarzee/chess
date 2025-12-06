@@ -132,13 +132,10 @@ public class GameWebSocketService {
             List<ServerMessage> messages = new ArrayList<>();
             messages.add(new LoadGameMessage(game));
 
-//            if (checkmate) {
-//                System.out.println("In checkmate if");
-//                messages.add(new NotificationMessage("Player " + username + " in checkmate. Game Over."));
-              if (stalemate) {
+            if (stalemate) {
                   System.out.println("In stalemate if");
                   messages.add(new NotificationMessage("Stalemate. Game Over."));
-              }
+            }
             if (check) {
                 System.out.println("In check if");
                 messages.add(new NotificationMessage("Player " + username + " in check."));
