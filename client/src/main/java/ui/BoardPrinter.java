@@ -23,6 +23,7 @@ public class BoardPrinter {
     }
 
     public static void printBoard(ChessBoard board, boolean white, ChessPosition highlightFrom, Set<ChessPosition> highlightTo) {
+        System.out.println("\n");
         printBoardHeader(white);
 
         for (int dr = 0; dr < 8; dr++) {

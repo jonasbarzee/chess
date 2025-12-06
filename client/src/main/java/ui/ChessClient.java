@@ -266,6 +266,10 @@ public class ChessClient {
         ChessGame game = currentGame;
         boolean whitePerspective;
 
+        if (currentGame.getBoard().getPiece(position) == null) {
+            throw new ResponseException(ResponseException.Code.ClientError, "No piece and specified position.");
+        }
+
         if (game == null) {
             throw new ResponseException(ResponseException.Code.ClientError, "Not in a game");
         }
