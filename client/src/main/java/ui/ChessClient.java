@@ -210,6 +210,16 @@ public class ChessClient {
         ChessMove move = parseMove(start, end);
         ChessPiece currentPiece = currentGame.getBoard().getPiece(move.getStartPosition());
 
+        ChessGame.TeamColor color = playerColor.equalsIgnoreCase("white") ? WHITE : BLACK;
+
+        if (currentGame.getTeamTurn() != color) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Not your turn.");
+        }
+
+        if (currentPiece == null) {
+            throw new ResponseException(ResponseException.Code.ClientError, "No piece at specified position");
+        }
+
         ChessPiece.PieceType promo = null;
         if (params.length == 3) {
             promo = parsePromo(params[2]);
@@ -226,10 +236,9 @@ public class ChessClient {
             }
         }
 
-
-        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move, playerColor, promo);
+        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move, playerColor, promo, start + " " + end);
         webSocketClient.send(gson.toJson(makeMoveCommand));
-        return "Move: " + move + "submitted";
+        return "Move: " + start + " " + end;
     }
 
     private ChessPiece.PieceType parsePromo(String s) throws ResponseException {

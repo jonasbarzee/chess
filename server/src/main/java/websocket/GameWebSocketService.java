@@ -133,7 +133,7 @@ public class GameWebSocketService {
                 System.out.println("In check if");
                 messages.add(new NotificationMessage("Player " + username + " in check."));
             } else {
-                messages.add(new NotificationMessage("Player " + username + " made move " + makeMoveCommand.getMove().toString()));
+                messages.add(new NotificationMessage("Player " + username + " made move " + makeMoveCommand.getPrettyMove()));
             }
             System.out.println("Messages: " + messages);
             return messages;
