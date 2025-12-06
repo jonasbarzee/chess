@@ -52,8 +52,12 @@ public class WebsocketConnectionManager {
         System.out.println("Sessions in game " + gameId + ": " + sessions);
 
         for (Session session : sessions) {
-            if (!session.isOpen()) continue;
-            if (!toAll && session == exclude) continue;
+            if (!session.isOpen()) {
+                continue;
+            }
+            if (!toAll && session == exclude) {
+                continue;
+            }
 
             try {
                 session.getRemote().sendString(msg);

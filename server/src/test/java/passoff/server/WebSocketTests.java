@@ -332,7 +332,8 @@ public class WebSocketTests {
         }
         else {
             assertCommandMessages(actualMessages, expectSuccess, sender, types(ServerMessage.ServerMessageType.LOAD_GAME),
-                    inGame, types(ServerMessage.ServerMessageType.LOAD_GAME, ServerMessage.ServerMessageType.NOTIFICATION), otherClients, description);
+                    inGame, types(ServerMessage.ServerMessageType.LOAD_GAME,
+                            ServerMessage.ServerMessageType.NOTIFICATION), otherClients, description);
         }
     }
 
