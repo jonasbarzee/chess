@@ -69,7 +69,11 @@ public class GameWebSocketService {
     public List<ServerMessage> handleMove(MakeMoveCommand makeMoveCommand, Session session, int gameId) throws ChessServerException {
         try {
             System.out.println("Move: " + makeMoveCommand.getMove());
-            ChessMove move = makeMoveCommand.getMove();
+            ChessMove original = makeMoveCommand.getMove();
+            ChessPiece.PieceType promo = makeMoveCommand.getPromoPiece();
+            ChessMove move = new ChessMove(original.getStartPosition(), original.getEndPosition(), promo);
+
+
             GameData gameData = gameDataAccess.getGame(gameId);
             String username = authDataAccess.getUsername(makeMoveCommand.getAuthToken());
             System.out.println(gameData.whiteUsername() + " " + username);
@@ -121,13 +125,13 @@ public class GameWebSocketService {
 
             if (checkmate) {
                 System.out.println("In checkmate if");
-                messages.add(new NotificationMessage("Checkmate. Game Over."));
+                messages.add(new NotificationMessage("Player " + username + " in checkmate. Game Over."));
             } else if (stalemate) {
                 System.out.println("In stalemate if");
                 messages.add(new NotificationMessage("Stalemate. Game Over."));
             } else if (check) {
                 System.out.println("In check if");
-                messages.add(new NotificationMessage("Check."));
+                messages.add(new NotificationMessage("Player " + username + " in check."));
             } else {
                 messages.add(new NotificationMessage("Player " + username + " made move " + makeMoveCommand.getMove().toString()));
             }

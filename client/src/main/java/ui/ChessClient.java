@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import chess.request.*;
 import chess.result.*;
 import com.google.gson.Gson;
@@ -17,6 +14,9 @@ import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
 import java.util.*;
+
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 
 public class ChessClient {
 
@@ -201,18 +201,49 @@ public class ChessClient {
 
     public String makeMove(String... params) throws ResponseException {
         assertLoggedIn();
-        if (params.length != 2) {
+        if (params.length < 2) {
            throw new ResponseException(ResponseException.Code.ClientError, "Expected <start pos> <end pos>");
         }
 
         String start = params[0];
         String end = params[1];
         ChessMove move = parseMove(start, end);
+        ChessPiece currentPiece = currentGame.getBoard().getPiece(move.getStartPosition());
 
-        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move, playerColor);
-        WebSocketClient webSocketClient = new WebSocketClient(serverUrl, new ClientMessageHandler(this));
+        ChessPiece.PieceType promo = null;
+        if (params.length == 3) {
+            promo = parsePromo(params[2]);
+        }
+
+        if (currentPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            int endRow = move.getEndPosition().getRow();
+            if ((currentPiece.getTeamColor() == WHITE && endRow == 8) ||
+            (currentPiece.getTeamColor() == BLACK && endRow == 1))
+            {
+                if (promo == null) {
+                    throw new ResponseException(ResponseException.Code.ClientError, "Promotion move need <start> <end> <promoPiece> (q, b, r, n)");
+                }
+            }
+        }
+
+
+        UserGameCommand makeMoveCommand = new MakeMoveCommand(session.authToken(), gameId, move, playerColor, promo);
         webSocketClient.send(gson.toJson(makeMoveCommand));
         return "Move: " + move + "submitted";
+    }
+
+    private ChessPiece.PieceType parsePromo(String s) throws ResponseException {
+        if (s.length() != 1) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Promo piece much be one letter, q r b n");
+        }
+
+        return switch (Character.toLowerCase(s.charAt(0))) {
+            case 'q' -> ChessPiece.PieceType.QUEEN;
+            case 'r' -> ChessPiece.PieceType.ROOK;
+            case 'b' -> ChessPiece.PieceType.BISHOP;
+            case 'n' -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new ResponseException(ResponseException.Code.ClientError, "Invalid promotion piece, use q r b or n");
+        };
     }
 
     public String highlight(String... params) throws ResponseException {
@@ -230,7 +261,7 @@ public class ChessClient {
             throw new ResponseException(ResponseException.Code.ClientError, "Not in a game");
         }
 
-        if (playerColor.equalsIgnoreCase("black")) {
+        if (playerColor != null && playerColor.equalsIgnoreCase("black")) {
             whitePerspective = false;
         } else {
             whitePerspective = true;
