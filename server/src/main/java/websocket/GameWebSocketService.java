@@ -77,7 +77,12 @@ public class GameWebSocketService {
             GameData gameData = gameDataAccess.getGame(gameId);
             String username = authDataAccess.getUsername(makeMoveCommand.getAuthToken());
             System.out.println(gameData.whiteUsername() + " " + username);
-            ChessGame.TeamColor color = gameData.whiteUsername().equalsIgnoreCase(username.toLowerCase())? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+            ChessGame.TeamColor color;
+            if (gameData.whiteUsername().equalsIgnoreCase(username.toLowerCase())) {
+                color = ChessGame.TeamColor.WHITE;
+            } else {
+               color = ChessGame.TeamColor.BLACK;
+            }
             ChessGame game = gameData.game();
             ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
             Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
