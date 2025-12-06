@@ -38,8 +38,4 @@ public class ClientMessageHandler implements ServerMessageHandler {
         System.out.println("Notification: " + notificationMessage.getMessage());
 
     }
-
-    public void addObserver(ChessClient chessClient) {
-
-    }
 }
