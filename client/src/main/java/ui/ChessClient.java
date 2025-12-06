@@ -353,6 +353,14 @@ public class ChessClient {
 
     public String resign() throws ResponseException {
 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Are you sure you want to resign (y/n) ");
+        String input = scanner.nextLine();
+
+        if (!input.equalsIgnoreCase("y")) {
+            return "Cancel Resign";
+        }
+
         try {
             UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, session.authToken(), gameId, playerColor);
             webSocketClient.send(gson.toJson(resignCommand));
